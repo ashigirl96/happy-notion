@@ -1,3 +1,4 @@
+import type { RichTextField, RichTextFieldProperty } from '@/fields/rich-text'
 import type { RelationField, RelationFieldCondition } from './relation'
 import type { TextField, TextFieldCondition, TextFieldProperty } from './text'
 
@@ -10,7 +11,7 @@ export type FindCriteria<T> = {
     | { and: Array<Condition<T[keyof T]>> }
     | { or: Array<Condition<T[keyof T]>> }
 }
-export type Condition<T> = T extends TextField
+export type Condition<T> = T extends TextField | RichTextField
   ? TextFieldCondition
   : T extends RelationField
     ? RelationFieldCondition
@@ -26,7 +27,9 @@ export type SaveCriteria<T> = {
   properties: {
     [K in keyof T as K extends ExcludedKeys ? never : K]: T[K] extends TextField
       ? TextFieldProperty
-      : never
+      : T[K] extends RichTextField
+        ? RichTextFieldProperty
+        : never
   }
 }
 
