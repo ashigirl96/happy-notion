@@ -1,3 +1,10 @@
+export type TextFieldProperty = {
+  title: {
+    text: {
+      content: string
+    }
+  }[]
+}
 export type TextFieldEquals = {
   property: string
   title: {
@@ -37,6 +44,18 @@ export type TextFieldEndsWith = {
 
 export class TextField {
   constructor(readonly content: string) {}
+
+  property(value: string): TextFieldProperty {
+    return {
+      title: [
+        {
+          text: {
+            content: value,
+          },
+        },
+      ],
+    }
+  }
 
   equals(value: string): TextFieldEquals {
     return {

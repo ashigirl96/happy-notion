@@ -1,5 +1,5 @@
 import type { RelationField, RelationFieldCondition } from './relation'
-import type { TextField, TextFieldCondition } from './text'
+import type { TextField, TextFieldCondition, TextFieldProperty } from './text'
 
 export { TextField } from './text'
 export { RelationField } from './relation'
@@ -15,3 +15,19 @@ export type Condition<T> = T extends TextField
   : T extends RelationField
     ? RelationFieldCondition
     : never
+
+// export type SaveCriteria<T> = {
+//   properties: {
+//     [K in keyof T]: T[K] extends TextField ? TextFieldProperty : never
+//   }
+// }
+type ExcludedKeys = 'id' | 'save' | 'findBy'
+export type SaveCriteria<T> = {
+  properties: {
+    [K in keyof T as K extends ExcludedKeys ? never : K]: T[K] extends TextField
+      ? TextFieldProperty
+      : never
+  }
+}
+
+// id: never;   Name: TextFieldProperty;   findBy: never;   save: never;

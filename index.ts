@@ -4,7 +4,17 @@ import { AbstractDatabase, RelationField, TextField } from './src'
 export class Architecture extends AbstractDatabase<Architecture> {
   id = process.env.INPUT_DATABASE_ID ?? ''
   title = new TextField('title')
-  category = new RelationField('category')
+  outputs = new RelationField('outputs')
+
+  // biome-ignore lint/complexity/noUselessConstructor: <explanation>
+  constructor(client: Client) {
+    super(client)
+  }
+}
+
+export class Word extends AbstractDatabase<Word> {
+  id = process.env.WORD_DATABASE_ID ?? ''
+  Name = new TextField('Name')
 
   // biome-ignore lint/complexity/noUselessConstructor: <explanation>
   constructor(client: Client) {
@@ -17,13 +27,20 @@ async function main() {
     auth: process.env.NOTION_TOKEN,
   })
 
-  const architecture = new Architecture(client)
-  const results = await architecture.findBy({
-    where: {
-      and: [architecture.title.contains('建築はどうして'), architecture.category.isNotEmpty()],
+  // const architecture = new Architecture(client)
+  // const results = await architecture.findBy({
+  //   where: {
+  //     ...architecture.outputs.isEmpty(),
+  //     // and: [architecture.title.contains('建築はどうして'), architecture.outputs.isNotEmpty()],
+  //   },
+  // })
+  // console.dir(results, { depth: null })
+  const word = new Word(client)
+  await word.save({
+    properties: {
+      Name: word.Name.property('test'),
     },
   })
-  console.log(results)
 }
 
 void main()
