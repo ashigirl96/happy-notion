@@ -2,7 +2,7 @@ import type { FindCriteria } from '@/fields'
 import type { Client } from '@notionhq/client'
 
 export abstract class AbstractDatabase<T> {
-  constructor(
+  protected constructor(
     protected client: Client,
     protected id: string,
   ) {}
