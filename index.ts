@@ -7,12 +7,12 @@ const client = new Client({
 
 const id = process.env.INPUT_DATABASE_ID ?? ''
 export class Architecture extends AbstractDatabase<Architecture> {
-  Title: TextField
+  title: TextField
   category: RelationField
 
   constructor(client: Client, id: string) {
     super(client, id)
-    this.Title = new TextField('title')
+    this.title = new TextField('title')
     this.category = new RelationField('category')
   }
 }
@@ -21,7 +21,7 @@ async function main() {
   const architecture = new Architecture(client, id)
   const results = await architecture.findBy({
     where: {
-      and: [architecture.Title.contains('建築はどうして'), architecture.category.isNotEmpty()],
+      and: [architecture.title.contains('建築はどうして'), architecture.category.isNotEmpty()],
     },
   })
   console.log(results)
