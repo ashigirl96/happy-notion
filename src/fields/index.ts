@@ -1,8 +1,10 @@
 import type { RichTextField, RichTextFieldProperty } from '@/fields/rich-text'
 import type { RelationField, RelationFieldCondition } from './relation'
+import type { SelectField, SelectFieldProperty } from './select'
 import type { TextField, TextFieldCondition, TextFieldProperty } from './text'
 
 export { TextField } from './text'
+export { SelectField } from './select'
 export { RelationField } from './relation'
 
 export type FindCriteria<T> = {
@@ -17,11 +19,6 @@ export type Condition<T> = T extends TextField | RichTextField
     ? RelationFieldCondition
     : never
 
-// export type SaveCriteria<T> = {
-//   properties: {
-//     [K in keyof T]: T[K] extends TextField ? TextFieldProperty : never
-//   }
-// }
 type ExcludedKeys = 'id' | 'save' | 'findBy'
 export type SaveCriteria<T> = {
   properties: {
@@ -29,7 +26,9 @@ export type SaveCriteria<T> = {
       ? TextFieldProperty
       : T[K] extends RichTextField
         ? RichTextFieldProperty
-        : never
+        : T[K] extends SelectField
+          ? SelectFieldProperty
+          : never
   }
 }
 
