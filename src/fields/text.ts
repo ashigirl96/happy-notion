@@ -1,7 +1,44 @@
+export type TextFieldEquals = {
+  property: string
+  title: {
+    equals: string
+  }
+}
+export type TextFieldDoesNotEqual = {
+  property: string
+  title: {
+    does_not_equal: string
+  }
+}
+export type TextFieldContains = {
+  property: string
+  title: {
+    contains: string
+  }
+}
+export type TextFieldDoesNotContain = {
+  property: string
+  title: {
+    does_not_contain: string
+  }
+}
+export type TextFieldStartsWith = {
+  property: string
+  title: {
+    starts_with: string
+  }
+}
+export type TextFieldEndsWith = {
+  property: string
+  title: {
+    ends_with: string
+  }
+}
+
 export class TextField {
   constructor(readonly content: string) {}
 
-  equals(value: string) {
+  equals(value: string): TextFieldEquals {
     return {
       property: this.content,
       title: {
@@ -10,7 +47,7 @@ export class TextField {
     }
   }
 
-  doesNotEqual(value: string) {
+  doesNotEqual(value: string): TextFieldDoesNotEqual {
     return {
       property: this.content,
       title: {
@@ -19,7 +56,7 @@ export class TextField {
     }
   }
 
-  contains(value: string) {
+  contains(value: string): TextFieldContains {
     return {
       property: this.content,
       title: {
@@ -28,7 +65,7 @@ export class TextField {
     }
   }
 
-  doesNotContain(value: string) {
+  doesNotContain(value: string): TextFieldDoesNotContain {
     return {
       property: this.content,
       title: {
@@ -37,7 +74,7 @@ export class TextField {
     }
   }
 
-  startsWith(value: string) {
+  startsWith(value: string): TextFieldStartsWith {
     return {
       property: this.content,
       title: {
@@ -46,7 +83,7 @@ export class TextField {
     }
   }
 
-  endsWith(value: string) {
+  endsWith(value: string): TextFieldEndsWith {
     return {
       property: this.content,
       title: {
@@ -55,3 +92,10 @@ export class TextField {
     }
   }
 }
+export type TextFieldCondition =
+  | TextFieldEquals
+  | TextFieldDoesNotEqual
+  | TextFieldContains
+  | TextFieldDoesNotContain
+  | TextFieldStartsWith
+  | TextFieldEndsWith
