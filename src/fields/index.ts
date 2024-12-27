@@ -34,8 +34,10 @@ export type Condition<T> = T extends TextField | RichTextField | UrlField
         : never
 
 type ExcludedKeys = 'id' | 'save' | 'findBy'
+export type BlockObjectRequest = Exclude<CreatePageParameters['children'], undefined>[0]
 export type SaveCriteria<T> = {
   emoji?: Extract<CreatePageParameters['icon'], { type?: 'emoji' }>['emoji']
+  children?: BlockObjectRequest[]
   properties: {
     [K in keyof T as K extends ExcludedKeys ? never : K]?: T[K] extends TextField
       ? TextFieldProperty

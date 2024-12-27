@@ -59,6 +59,22 @@ async function main() {
   const word = new Word(client)
   await word.save({
     emoji: '📚',
+    children: [
+      {
+        object: 'block',
+        type: 'paragraph',
+        paragraph: {
+          rich_text: [
+            {
+              type: 'text',
+              text: {
+                content: 'test',
+              },
+            },
+          ],
+        },
+      },
+    ],
     properties: {
       Name: word.Name.property('test'),
       ref: word.ref.property('https://example.com'),

@@ -25,6 +25,7 @@ export abstract class AbstractDatabase<T> {
         type: 'emoji',
         emoji: criteria.emoji,
       },
+      children: criteria.children,
       // @ts-expect-error: TODO: このエラーを解消する
       properties: criteria.properties,
     })
