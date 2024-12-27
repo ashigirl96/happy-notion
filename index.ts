@@ -1,6 +1,5 @@
 import { Client } from '@notionhq/client'
-import { AbstractDatabase, RelationField, SelectField, TextField } from './src'
-import { RichTextField } from './src/fields/rich-text'
+import { AbstractDatabase, RelationField, RichTextField, SelectField, TextField } from './src'
 
 export class Architecture extends AbstractDatabase<Architecture> {
   id = process.env.INPUT_DATABASE_ID ?? ''

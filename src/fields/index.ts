@@ -6,6 +6,7 @@ import type { TextField, TextFieldCondition, TextFieldProperty } from './text'
 export { TextField } from './text'
 export { SelectField } from './select'
 export { RelationField } from './relation'
+export { RichTextField } from './rich-text'
 
 export type FindCriteria<T> = {
   where:
