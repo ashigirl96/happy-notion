@@ -17,11 +17,11 @@ export abstract class AbstractDatabase<T> {
   }
 
   async save(criteria: SaveCriteria<T>) {
-    console.dir(criteria, { depth: null })
     const _response = await this.client.pages.create({
       parent: {
         database_id: this.id,
       },
+      // @ts-expect-error: TODO: このエラーを解消する
       properties: criteria.properties,
     })
     console.dir(_response, { depth: null })

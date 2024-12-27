@@ -41,7 +41,6 @@ async function main() {
   await word.save({
     properties: {
       Name: word.Name.property('test'),
-      pronunciation: word.pronunciation.property('test'),
     },
   })
 }

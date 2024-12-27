@@ -25,7 +25,7 @@ export type Condition<T> = T extends TextField | RichTextField
 type ExcludedKeys = 'id' | 'save' | 'findBy'
 export type SaveCriteria<T> = {
   properties: {
-    [K in keyof T as K extends ExcludedKeys ? never : K]: T[K] extends TextField
+    [K in keyof T as K extends ExcludedKeys ? never : K]?: T[K] extends TextField
       ? TextFieldProperty
       : T[K] extends RichTextField
         ? RichTextFieldProperty
