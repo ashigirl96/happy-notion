@@ -1,4 +1,4 @@
-export { TextField, RelationField, SelectField, RichTextField } from './fields'
+export { TextField, RelationField, SelectField, RichTextField, UrlField } from './fields'
 export type {
   Condition,
   FindCriteria,

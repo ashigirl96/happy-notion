@@ -41,6 +41,18 @@ export type TextFieldEndsWith = {
     ends_with: string
   }
 }
+export type TextFieldIsEmpty = {
+  property: string
+  title: {
+    is_empty: true
+  }
+}
+export type TextFieldIsNotEmpty = {
+  property: string
+  title: {
+    is_not_empty: true
+  }
+}
 
 export class TextField {
   constructor(readonly content: string) {}
@@ -110,6 +122,24 @@ export class TextField {
       },
     }
   }
+
+  isEmpty(): TextFieldIsEmpty {
+    return {
+      property: this.content,
+      title: {
+        is_empty: true,
+      },
+    }
+  }
+
+  isNotEmpty(): TextFieldIsNotEmpty {
+    return {
+      property: this.content,
+      title: {
+        is_not_empty: true,
+      },
+    }
+  }
 }
 export type TextFieldCondition =
   | TextFieldEquals
@@ -118,3 +148,5 @@ export type TextFieldCondition =
   | TextFieldDoesNotContain
   | TextFieldStartsWith
   | TextFieldEndsWith
+  | TextFieldIsEmpty
+  | TextFieldIsNotEmpty
