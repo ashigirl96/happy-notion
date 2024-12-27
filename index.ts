@@ -1,5 +1,5 @@
 import { Client } from '@notionhq/client'
-import { AbstractDatabase, RelationField, TextField } from './src'
+import { AbstractDatabase, RelationField, SelectField, TextField } from './src'
 import { RichTextField } from './src/fields/rich-text'
 
 export class Architecture extends AbstractDatabase<Architecture> {
@@ -17,6 +17,7 @@ export class Word extends AbstractDatabase<Word> {
   id = process.env.WORD_DATABASE_ID ?? ''
   Name = new TextField('Name')
   pronunciation = new RichTextField('pronunciation')
+  type = new SelectField('type')
 
   // biome-ignore lint/complexity/noUselessConstructor: <explanation>
   constructor(client: Client) {
@@ -38,11 +39,17 @@ async function main() {
   // })
   // console.dir(results, { depth: null })
   const word = new Word(client)
-  await word.save({
-    properties: {
-      Name: word.Name.property('test'),
-    },
-  })
+  // await word.save({
+  //   properties: {
+  //     Name: word.Name.property('test'),
+  //   },
+  // })
+  console.dir(
+    await word.findBy({
+      where: word.type.equals('金融工学'),
+    }),
+    { depth: null },
+  )
 }
 
 void main()
