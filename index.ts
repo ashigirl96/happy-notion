@@ -15,14 +15,8 @@ export class Architecture {
     this.category = new RelationField('category')
   }
 
+  // TODO: fp-tsのEitherを使ってエラー処理を追加する
   async findBy(criteria: FindCriteria<Architecture>) {
-    console.dir(
-      {
-        database_id: id,
-        filter: criteria.where,
-      },
-      { depth: null },
-    )
     const response = await client.databases.query({
       database_id: id,
       // @ts-expect-error
