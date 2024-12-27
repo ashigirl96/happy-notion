@@ -1,5 +1,6 @@
 import type { RichTextField, RichTextFieldProperty } from '@/fields/rich-text'
 import type { UrlField, UrlFieldProperty } from '@/fields/url'
+import type { CreatePageParameters } from '@notionhq/client/build/src/api-endpoints'
 import type {
   MultiSelectField,
   MultiSelectFieldCondition,
@@ -34,6 +35,7 @@ export type Condition<T> = T extends TextField | RichTextField | UrlField
 
 type ExcludedKeys = 'id' | 'save' | 'findBy'
 export type SaveCriteria<T> = {
+  emoji?: Extract<CreatePageParameters['icon'], { type?: 'emoji' }>['emoji']
   properties: {
     [K in keyof T as K extends ExcludedKeys ? never : K]?: T[K] extends TextField
       ? TextFieldProperty

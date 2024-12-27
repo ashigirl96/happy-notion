@@ -56,26 +56,14 @@ async function main() {
   //   },
   // })
   // console.dir(results, { depth: null })
-  // const word = new Word(client)
-  // await word.save({
-  //   properties: {
-  //     Name: word.Name.property('test'),
-  //     ref: word.ref.property('https://example.com'),
-  //   },
-  // })
-  // console.dir(
-  //   await word.findBy({
-  //     where: word.ref.isNotEmpty(),
-  //   }),
-  //   { depth: null },
-  // )
-  const daily = new Daily(client)
-  console.dir(
-    await daily.findBy({
-      where: daily.Categories.isEmpty(),
-    }),
-    { depth: null },
-  )
+  const word = new Word(client)
+  await word.save({
+    emoji: '📚',
+    properties: {
+      Name: word.Name.property('test'),
+      ref: word.ref.property('https://example.com'),
+    },
+  })
 }
 
 void main()
