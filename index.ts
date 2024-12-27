@@ -1,6 +1,7 @@
 import { Client } from '@notionhq/client'
 import {
   AbstractDatabase,
+  MultiSelectField,
   RelationField,
   RichTextField,
   SelectField,
@@ -32,6 +33,16 @@ export class Word extends AbstractDatabase<Word> {
   }
 }
 
+export class Daily extends AbstractDatabase<Daily> {
+  id = process.env.DAILY_DATABASE_ID ?? ''
+  Categories = new MultiSelectField('Categories')
+
+  // biome-ignore lint/complexity/noUselessConstructor: <explanation>
+  constructor(client: Client) {
+    super(client)
+  }
+}
+
 async function main() {
   const client = new Client({
     auth: process.env.NOTION_TOKEN,
@@ -45,15 +56,23 @@ async function main() {
   //   },
   // })
   // console.dir(results, { depth: null })
-  const word = new Word(client)
+  // const word = new Word(client)
   // await word.save({
   //   properties: {
   //     Name: word.Name.property('test'),
+  //     ref: word.ref.property('https://example.com'),
   //   },
   // })
+  // console.dir(
+  //   await word.findBy({
+  //     where: word.ref.isNotEmpty(),
+  //   }),
+  //   { depth: null },
+  // )
+  const daily = new Daily(client)
   console.dir(
-    await word.findBy({
-      where: word.ref.isNotEmpty(),
+    await daily.findBy({
+      where: daily.Categories.isEmpty(),
     }),
     { depth: null },
   )

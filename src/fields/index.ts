@@ -1,5 +1,10 @@
 import type { RichTextField, RichTextFieldProperty } from '@/fields/rich-text'
 import type { UrlField, UrlFieldProperty } from '@/fields/url'
+import type {
+  MultiSelectField,
+  MultiSelectFieldCondition,
+  MultiSelectFieldProperty,
+} from './multi-select'
 import type { RelationField, RelationFieldCondition } from './relation'
 import type { SelectField, SelectFieldCondition, SelectFieldProperty } from './select'
 import type { TextField, TextFieldCondition, TextFieldProperty } from './text'
@@ -9,6 +14,7 @@ export { SelectField } from './select'
 export { RelationField } from './relation'
 export { RichTextField } from './rich-text'
 export { UrlField } from './url'
+export { MultiSelectField } from './multi-select'
 
 export type FindCriteria<T> = {
   where:
@@ -22,7 +28,9 @@ export type Condition<T> = T extends TextField | RichTextField | UrlField
     ? RelationFieldCondition
     : T extends SelectField
       ? SelectFieldCondition
-      : never
+      : T extends MultiSelectField
+        ? MultiSelectFieldCondition
+        : never
 
 type ExcludedKeys = 'id' | 'save' | 'findBy'
 export type SaveCriteria<T> = {
@@ -35,7 +43,9 @@ export type SaveCriteria<T> = {
           ? SelectFieldProperty
           : T[K] extends UrlField
             ? UrlFieldProperty
-            : never
+            : T[K] extends MultiSelectField
+              ? MultiSelectFieldProperty
+              : never
   }
 }
 
