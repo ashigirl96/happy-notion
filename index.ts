@@ -1,6 +1,9 @@
-import { generate } from './src'
+import * as path from 'node:path'
 
-generate()
+// generate()
+
+const config = require(path.join(process.cwd(), 'example', 'notion.config.ts'))
+console.log(config)
 
 // import { Client } from '@notionhq/client'
 // import * as n from './src'
