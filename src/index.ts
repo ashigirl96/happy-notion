@@ -12,3 +12,4 @@ export type {
   SaveCriteria,
 } from './fields'
 export { AbstractDatabase } from './core'
+export { generate } from './generate'
