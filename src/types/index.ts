@@ -19,5 +19,6 @@ export const mappedConfig = z.object({
 })
 export type MappedConfig = {
   databases: Record<string, { raw: string; evaluated: string }>
+  apiKey: string
   client: Client
 }

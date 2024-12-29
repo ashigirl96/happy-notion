@@ -17,7 +17,7 @@ export function addClass(
     properties: [
       {
         name: 'id',
-        initializer: `process.env.${envVar} ?? ''`,
+        initializer: envVar,
         isPublic: true,
       },
       ...fields.map((field) => ({
@@ -35,7 +35,7 @@ export function addClass(
           },
         ],
         statements: ['super(client)'],
-        docs: ['// biome-ignore lint/complexity/noUselessConstructor: <explanation>'],
+        docs: ['biome-ignore lint/complexity/noUselessConstructor: <explanation>'],
       },
     ],
   })

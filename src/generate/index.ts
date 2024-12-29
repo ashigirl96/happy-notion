@@ -2,7 +2,13 @@ import { generateClasses } from '@/generate/generateClass'
 import type { MappedConfig, NotionConfig } from '@/types'
 import { Client } from '@notionhq/client'
 // generate.ts
-import { IndentationText, Project, QuoteKind } from 'ts-morph'
+import {
+  IndentationText,
+  Project,
+  QuoteKind,
+  type SourceFile,
+  VariableDeclarationKind,
+} from 'ts-morph'
 
 function initializeSourceFile() {
   const tsConfigFilePath = require.resolve('../../tsconfig.json')
@@ -64,13 +70,46 @@ function mapConfig(raw: NotionConfig, evaluated: NotionConfig): MappedConfig {
         },
       ]),
     ),
+    apiKey: raw.apiKey,
     client: new Client({ auth: evaluated.apiKey }),
   }
+}
+
+function addNotionClientStatement(sourceFile: SourceFile, apiKey: string) {
+  sourceFile.addVariableStatement({
+    declarationKind: VariableDeclarationKind.Const,
+    declarations: [
+      {
+        name: 'client',
+        initializer: `new Client({ auth: ${apiKey} })`,
+      },
+    ],
+  })
+}
+
+function addExportDatabaseEntries(sourceFile: SourceFile, mapped: MappedConfig) {
+  const entries = Object.entries(mapped.databases).map(([className]) => {
+    return `${className}: new ${className}(client)`
+  })
+
+  sourceFile.addVariableStatement({
+    isExported: true,
+    declarationKind: VariableDeclarationKind.Const,
+    declarations: [
+      {
+        name: 'databases',
+        initializer: `{\n${entries.join(',\n')}\n}`,
+      },
+    ],
+  })
 }
 
 export async function generate(raw: NotionConfig, evaluated: NotionConfig) {
   const sourceFile = initializeSourceFile()
   const mapped = mapConfig(raw, evaluated)
   await generateClasses(sourceFile, mapped)
+  addNotionClientStatement(sourceFile, mapped.apiKey)
+  addExportDatabaseEntries(sourceFile, mapped)
+  sourceFile.saveSync()
   console.log(sourceFile.getFullText())
 }

@@ -68,6 +68,3 @@ export const RawField = {
 } as const
 export type RawField = typeof RawField
 export const RawFieldKeys = Object.keys(RawField) as Array<keyof RawField>
-
-// id: never;   Name: TextFieldProperty;   findBy: never;   save: never;
-console.log(RawField)
