@@ -1,11 +1,11 @@
 {
   "version": "0.0.1",
-  "name": "happy-notion",
+  "name": "@ashigirl96/happy-notion",
   "type": "module",
   "module": "index.ts",
   "main": "src/index.ts",
   "bin": {
-    "notion-happy": "src/cli.ts"
+    "happy-notion": "src/cli.ts"
   },
   "exports": {
     ".": {
