@@ -6,7 +6,12 @@
     "paths": {
       "@/*": ["./src/*"]
     },
-    "outDir": "./dist"
+    "outDir": "./dist",
+
+    "target": "ES2017",
+    "lib": ["DOM", "ESNext"],
+    "module": "ESNext",
+    "moduleResolution": "Node"
   },
   "exclude": ["src/generate/*.ts"],
   "include": ["src/index.ts"]
