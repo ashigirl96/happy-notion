@@ -2,6 +2,8 @@
 
 import * as fs from 'node:fs'
 import * as path from 'node:path'
+import { main } from '@/cli/main'
+import { type NotionConfig, notionConfig } from '@/types'
 import { Command } from 'commander'
 import { Project, SyntaxKind } from 'ts-morph'
 
@@ -23,11 +25,19 @@ program
       process.exit(1)
     }
 
+    const tsConfigFilePath = path.resolve(process.cwd(), 'tsconfig.json')
     const project = new Project({
-      // tsconfig.json のパスを指定
-      tsConfigFilePath: path.resolve(process.cwd(), 'tsconfig.json'),
+      tsConfigFilePath,
       skipAddingFilesFromTsConfig: true,
     })
+
+    const config = require(configPath)
+    const evaluatedConfig = notionConfig.safeParse(config.config)
+    if (!evaluatedConfig.success) {
+      console.error(config)
+      console.error('Invalid configuration:', evaluatedConfig.error.errors)
+      process.exit(1)
+    }
 
     const sourceFile = project.addSourceFileAtPath(configPath)
 
@@ -67,19 +77,15 @@ program
       process.exit(1)
     }
 
-    // 抽出したいプロパティ名を指定
-    const targetProps = ['Tasks', 'Projects', 'User']
-    const result: Record<string, string> = {}
-
+    const result: NotionConfig = {
+      databases: {},
+      apiKey: '',
+    }
     const databasesObject = databasesInitializer.asKindOrThrow(SyntaxKind.ObjectLiteralExpression)
-
-    for (const propName of targetProps) {
-      const prop = databasesObject.getProperty(propName)
+    for (const prop of databasesObject.getProperties()) {
       if (prop?.isKind(SyntaxKind.PropertyAssignment)) {
-        const value = prop.getInitializerOrThrow().getText()
-        result[propName] = value
-      } else {
-        console.warn(`\`${propName}\` プロパティが見つかりませんでした。`)
+        const propName = prop.getName()
+        result.databases[propName] = prop.getInitializerOrThrow().getText()
       }
     }
 
@@ -87,15 +93,19 @@ program
     const apiKeyProp = initializer
       .asKindOrThrow(SyntaxKind.ObjectLiteralExpression)
       .getProperty('apiKey')
-
+    //
     if (apiKeyProp?.isKind(SyntaxKind.PropertyAssignment)) {
-      const apiKeyValue = apiKeyProp.getInitializerOrThrow().getText()
-      result.apiKey = apiKeyValue
+      result.apiKey = apiKeyProp.getInitializerOrThrow().getText()
     } else {
-      console.warn('`apiKey` プロパティが見つかりませんでした。')
+      console.warn('Could not find `apiKey` property.')
     }
 
-    console.log(JSON.stringify(result, null, 2))
+    const rawConfig = notionConfig.safeParse(result)
+    if (!rawConfig.success) {
+      console.error('Invalid configuration:', rawConfig.error.errors)
+      process.exit(1)
+    }
+    main(rawConfig.data, evaluatedConfig.data)
   })
 
 // コマンドライン引数の解析

@@ -5,4 +5,4 @@ export const notionConfig = z.object({
   apiKey: z.string(),
 })
 
-export type NotionConfig = z.infer<typeof notionConfig>
+export type NotionConfig = z.input<typeof notionConfig>

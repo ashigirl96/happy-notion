@@ -1,6 +1,6 @@
 import type { NotionConfig } from '../src'
 
-const _config: NotionConfig = {
+export const config: NotionConfig = {
   databases: {
     Tasks: process.env.DATABASE1_ID ?? '',
     Projects: process.env.DATABASE2_ID ?? '',
@@ -8,5 +8,3 @@ const _config: NotionConfig = {
   },
   apiKey: process.env.NOTION_TOKEN ?? '',
 }
-
-export default _config
