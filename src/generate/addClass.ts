@@ -1,3 +1,4 @@
+import { kebabToCamel } from '@/generate/kebabToCamel'
 // クラス定義の関数
 import type { SourceFile } from 'ts-morph'
 
@@ -20,11 +21,14 @@ export function addClass(
         initializer: envVar,
         isPublic: true,
       },
-      ...fields.map((field) => ({
-        name: field.name,
-        initializer: `new n.${field.type}('${field.name}')`,
-        isPublic: true,
-      })),
+      ...fields.map((field) => {
+        const name = kebabToCamel(field.name)
+        return {
+          name,
+          initializer: `new n.${field.type}('${name}')`,
+          isPublic: true,
+        }
+      }),
     ],
     ctors: [
       {
