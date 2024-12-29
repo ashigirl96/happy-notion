@@ -1,11 +1,17 @@
 {
   "name": "happy-notion",
-  "module": "index.ts",
   "type": "module",
-  "main": "src/cli.ts",
+  "module": "index.ts",
+  "main": "src/index.ts",
   "bin": {
     "notion-happy": "src/cli.ts"
   },
+  "exports": {
+    ".": {
+      "import": "./src/index.ts"
+    }
+  },
+  "types": "./src/index.ts",
   "scripts": {
     "dev": "bun run src/cli.ts generate -c example/notion.config.ts"
   },
