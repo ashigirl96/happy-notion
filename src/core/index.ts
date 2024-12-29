@@ -16,8 +16,31 @@ export abstract class AbstractDatabase<T> {
     return response.results
   }
 
-  async save(criteria: SaveCriteria<T>) {
-    const _response = await this.client.pages.create({
+  async savePage(criteria: SaveCriteria<T>) {
+    const { update } = criteria
+    if (update) {
+      const response = await this.client.pages.update({
+        page_id: update.pageId,
+        icon: criteria.emoji && {
+          type: 'emoji',
+          emoji: criteria.emoji,
+        },
+        // @ts-expect-error: TODO: このエラーを解消する
+        properties: criteria.properties,
+      })
+      const isAppendChildren = await update.isAppendChildren(this.client)
+      if (isAppendChildren && criteria.children !== undefined) {
+        await this.client.blocks.children.append({
+          block_id: update.pageId,
+          children: criteria.children,
+        })
+      }
+      console.dir(response, { depth: null })
+      return {
+        url: toNotionURL(update.pageId),
+      }
+    }
+    const response = await this.client.pages.create({
       parent: {
         database_id: this.id,
       },
@@ -29,6 +52,13 @@ export abstract class AbstractDatabase<T> {
       // @ts-expect-error: TODO: このエラーを解消する
       properties: criteria.properties,
     })
-    console.dir(_response, { depth: null })
+    console.dir(response, { depth: null })
+    return {
+      url: toNotionURL(response.id),
+    }
   }
+}
+
+export function toNotionURL(pageId: string) {
+  return `https://www.notion.so/${pageId.replace(/-/g, '')}`
 }

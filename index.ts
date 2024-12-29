@@ -57,8 +57,17 @@ async function main() {
   // })
   // console.dir(results, { depth: null })
   const word = new Word(client)
-  await word.save({
+  await word.savePage({
     emoji: '📚',
+    update: {
+      pageId: '16b34b35bfa48025b1f4e2ec6a5063db',
+      isAppendChildren: async (client) => {
+        const blocks = await client.blocks.children.list({
+          block_id: '16b34b35bfa48025b1f4e2ec6a5063db',
+        })
+        return blocks.results.length < 3
+      },
+    },
     children: [
       {
         object: 'block',

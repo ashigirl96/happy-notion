@@ -1,5 +1,6 @@
 import type { RichTextField, RichTextFieldProperty } from '@/fields/rich-text'
 import type { UrlField, UrlFieldProperty } from '@/fields/url'
+import type { Client } from '@notionhq/client'
 import type { CreatePageParameters } from '@notionhq/client/build/src/api-endpoints'
 import type {
   MultiSelectField,
@@ -36,6 +37,10 @@ export type Condition<T> = T extends TextField | RichTextField | UrlField
 type ExcludedKeys = 'id' | 'save' | 'findBy'
 export type BlockObjectRequest = Exclude<CreatePageParameters['children'], undefined>[0]
 export type SaveCriteria<T> = {
+  update?: {
+    pageId: string
+    isAppendChildren: (client: Client) => Promise<boolean>
+  }
   emoji?: Extract<CreatePageParameters['icon'], { type?: 'emoji' }>['emoji']
   children?: BlockObjectRequest[]
   properties: {
