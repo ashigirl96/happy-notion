@@ -1,8 +1,8 @@
 {
-  "version": "0.0.5",
+  "version": "0.0.6",
   "name": "@ashigirl96/happy-notion",
   "type": "module",
-  "module": "index.ts",
+  "module": "src/index.ts",
   "main": "src/index.ts",
   "bin": {
     "happy-notion": "src/cli.ts"
@@ -16,7 +16,7 @@
   },
   "types": "./dist/index.d.ts",
   "scripts": {
-    "build": "bun run index.ts",
+    "build": "rm -rf dist && bun run index.ts",
     "dev": "bun run src/cli.ts generate -c example/notion.config.ts"
   },
   "devDependencies": {
