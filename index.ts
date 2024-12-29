@@ -1,8 +1,10 @@
-import { databases } from './generated'
-
-console.dir(
-  await databases.Tasks.findBy({
-    where: databases.Tasks.Name.contains('香山'),
-  }),
-  { depth: null },
-)
+import isolatedDecl from 'bun-plugin-isolated-decl'
+await Bun.build({
+  entrypoints: ['./src/index.ts'],
+  outdir: './dist',
+  plugins: [
+    isolatedDecl({
+      forceGenerate: true,
+    }),
+  ],
+})
