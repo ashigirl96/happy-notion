@@ -1,15 +1,15 @@
-import type { RichTextField, RichTextFieldProperty } from '@/fields/rich-text'
-import type { UrlField, UrlFieldProperty } from '@/fields/url'
 import type { Client } from '@notionhq/client'
 import type { CreatePageParameters } from '@notionhq/client/build/src/api-endpoints'
-import type {
+import {
   MultiSelectField,
-  MultiSelectFieldCondition,
-  MultiSelectFieldProperty,
+  type MultiSelectFieldCondition,
+  type MultiSelectFieldProperty,
 } from './multi-select'
-import type { RelationField, RelationFieldCondition } from './relation'
-import type { SelectField, SelectFieldCondition, SelectFieldProperty } from './select'
-import type { TextField, TextFieldCondition, TextFieldProperty } from './text'
+import { RelationField, type RelationFieldCondition } from './relation'
+import { RichTextField, type RichTextFieldProperty } from './rich-text'
+import { SelectField, type SelectFieldCondition, type SelectFieldProperty } from './select'
+import { TextField, type TextFieldCondition, type TextFieldProperty } from './text'
+import { UrlField, type UrlFieldProperty } from './url'
 
 export { TextField } from './text'
 export { SelectField } from './select'
@@ -58,4 +58,15 @@ export type SaveCriteria<T> = {
   }
 }
 
+export const RawField = {
+  relation: RelationField.name,
+  title: TextField.name,
+  multi_select: MultiSelectField.name,
+  select: SelectField.name,
+  url: UrlField.name,
+  rich_text: RichTextField.name,
+}
+export type RawField = typeof RawField
+
 // id: never;   Name: TextFieldProperty;   findBy: never;   save: never;
+console.log(RawField)
