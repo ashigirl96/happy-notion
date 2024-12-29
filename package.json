@@ -1,5 +1,5 @@
 {
-  "version": "0.0.8",
+  "version": "0.0.10",
   "name": "@ashigirl96/happy-notion",
   "type": "module",
   "module": "src/index.ts",
@@ -17,7 +17,7 @@
   "types": "./dist/index.d.ts",
   "scripts": {
     "build": "rm -rf dist && bun run build.ts",
-    "postinstall": "bun run build",
+    "prepare": "bun run build.ts",
     "dev": "bun run src/cli.ts generate -c example/notion.config.ts"
   },
   "devDependencies": {
