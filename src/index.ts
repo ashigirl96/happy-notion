@@ -1,5 +1,3 @@
-import 'tsconfig-paths/register'
-
 export {
   TextField,
   RelationField,
