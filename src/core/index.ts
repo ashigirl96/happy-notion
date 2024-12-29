@@ -25,7 +25,6 @@ export abstract class AbstractDatabase<T> {
           type: 'emoji',
           emoji: criteria.emoji,
         },
-        // @ts-expect-error: TODO: このエラーを解消する
         properties: criteria.properties,
       })
       const isAppendChildren = await update.isAppendChildren(this.client)
@@ -49,7 +48,6 @@ export abstract class AbstractDatabase<T> {
         emoji: criteria.emoji,
       },
       children: criteria.children,
-      // @ts-expect-error: TODO: このエラーを解消する
       properties: criteria.properties,
     })
     console.dir(response, { depth: null })

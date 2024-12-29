@@ -1,32 +1,13 @@
 {
   "compilerOptions": {
-    "target": "ES2017",
-    "lib": ["dom", "dom.iterable", "esnext"],
-    "allowJs": true,
     "skipLibCheck": true,
-    "strict": true,
-    "noEmit": true,
-    "esModuleInterop": true,
-    "module": "esnext",
-    "moduleResolution": "Node",
-    "resolveJsonModule": true,
-    "isolatedModules": true,
-    "jsx": "preserve",
-    "incremental": false,
-    "plugins": [
-      {
-        "name": "next"
-      }
-    ],
+    "declaration": true,
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"]
     },
-    "typeRoots": ["./node_modules/@types", "./src/types"],
-    "types": ["bun"],
-    "outDir": "./dist",
-    "declaration":true,
+    "outDir": "./dist"
   },
-  "include": ["src"],
-  "exclude": ["node_modules"]
+  "exclude": ["src/generate/*.ts"],
+  "include": ["src/index.ts"]
 }

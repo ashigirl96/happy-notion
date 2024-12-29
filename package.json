@@ -1,11 +1,9 @@
 {
-  "version": "0.0.10",
+  "version": "0.1.0",
   "name": "@ashigirl96/happy-notion",
   "type": "module",
-  "module": "src/index.ts",
-  "main": "src/index.ts",
   "bin": {
-    "happy-notion": "src/cli.ts"
+    "happy-notion": "dist/cli.js"
   },
   "exports": {
     ".": {
@@ -14,10 +12,10 @@
       "types": "./dist/index.d.ts"
     }
   },
+  "files": ["package.json", "dist"],
   "types": "./dist/index.d.ts",
   "scripts": {
-    "build": "rm -rf dist && bun run build.ts",
-    "prepare": "bun run build.ts",
+    "build": "rm -rf dist && bun build-cli.ts && tsc -p tsconfig.json",
     "dev": "bun run src/cli.ts generate -c example/notion.config.ts"
   },
   "devDependencies": {
