@@ -29,35 +29,11 @@ function initializeSourceFile() {
     },
     {
       namespaceImport: 'n',
-      moduleSpecifier: './src',
+      moduleSpecifier: '@ashigirl96/happy-notion',
     },
   ])
   return sourceFile
 }
-
-// addClass('Word', 'Word', 'WORD_DATABASE_ID', [
-//   { name: 'Name', type: 'TextField' },
-//   { name: 'pronunciation', type: 'RichTextField' },
-//   { name: 'type', type: 'SelectField' },
-//   { name: 'ref', type: 'UrlField' },
-// ])
-//
-// addClass('Daily', 'Daily', 'DAILY_DATABASE_ID', [{ name: 'Categories', type: 'MultiSelectField' }])
-//
-// // クライアントの作成と databases オブジェクトのエクスポート
-// sourceFile.addStatements(`
-// const client = new Client({ auth: process.env.NOTION_TOKEN })
-// export const databases = {
-//   architecture: new Architecture(client),
-//   word: new Word(client),
-//   daily: new Daily(client),
-// }
-// `)
-//
-// // ファイルの保存
-// sourceFile.saveSync()
-//
-// console.log('TypeScript ファイルが生成されました: generated.ts')
 
 function mapConfig(raw: NotionConfig, evaluated: NotionConfig): MappedConfig {
   return {
