@@ -2,7 +2,7 @@
 
 import * as fs from 'node:fs'
 import * as path from 'node:path'
-import { main } from '@/cli/main'
+import { generate } from '@/generate'
 import { type NotionConfig, notionConfig } from '@/types'
 import { Command } from 'commander'
 import { Project, SyntaxKind } from 'ts-morph'
@@ -105,7 +105,7 @@ program
       console.error('Invalid configuration:', rawConfig.error.errors)
       process.exit(1)
     }
-    await main(rawConfig.data, evaluatedConfig.data)
+    await generate(rawConfig.data, evaluatedConfig.data)
   })
 
 // コマンドライン引数の解析

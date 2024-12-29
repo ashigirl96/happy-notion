@@ -7,7 +7,7 @@
     "notion-happy": "src/cli.ts"
   },
   "scripts": {
-    "dev": "bun run src/cli/index.ts generate -c example/notion.config.ts"
+    "dev": "bun run src/cli.ts generate -c example/notion.config.ts"
   },
   "devDependencies": {
     "@biomejs/biome": "1.9.4",

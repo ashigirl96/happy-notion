@@ -1,4 +1,6 @@
-import { addClass } from '@/generate/addClass'
+import { generateClasses } from '@/generate/generateClass'
+import type { MappedConfig, NotionConfig } from '@/types'
+import { Client } from '@notionhq/client'
 // generate.ts
 import { IndentationText, Project, QuoteKind } from 'ts-morph'
 
@@ -51,17 +53,24 @@ function initializeSourceFile() {
 //
 // console.log('TypeScript ファイルが生成されました: generated.ts')
 
-export function generate() {
+function mapConfig(raw: NotionConfig, evaluated: NotionConfig): MappedConfig {
+  return {
+    databases: Object.fromEntries(
+      Object.entries(raw.databases).map(([key, value]) => [
+        key,
+        {
+          raw: value,
+          evaluated: evaluated.databases[key],
+        },
+      ]),
+    ),
+    client: new Client({ auth: evaluated.apiKey }),
+  }
+}
+
+export async function generate(raw: NotionConfig, evaluated: NotionConfig) {
   const sourceFile = initializeSourceFile()
-  addClass(sourceFile, {
-    className: 'Word',
-    envVar: 'WORD_DATABASE_ID',
-    fields: [
-      { name: 'Name', type: 'TextField' },
-      { name: 'pronunciation', type: 'RichTextField' },
-      { name: 'type', type: 'SelectField' },
-      { name: 'ref', type: 'UrlField' },
-    ],
-  })
+  const mapped = mapConfig(raw, evaluated)
+  await generateClasses(sourceFile, mapped)
   console.log(sourceFile.getFullText())
 }
