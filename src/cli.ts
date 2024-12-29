@@ -35,7 +35,7 @@ program
     const configVariable = sourceFile.getVariableDeclaration('config')
 
     if (!configVariable) {
-      console.error('`config` 変数が見つかりませんでした。')
+      console.error('Cloud not find `config` variable.')
       process.exit(1)
     }
 
@@ -43,7 +43,7 @@ program
     const initializer = configVariable.getInitializer()
 
     if (!initializer || !initializer.isKind(SyntaxKind.ObjectLiteralExpression)) {
-      console.error('`config` の初期化がオブジェクトリテラルではありません。')
+      console.error('The initializer of `config` is not an object literal.')
       process.exit(1)
     }
 
@@ -53,7 +53,7 @@ program
       .getProperty('databases')
 
     if (!databasesProp || !databasesProp.isKind(SyntaxKind.PropertyAssignment)) {
-      console.error('`databases` プロパティが見つかりませんでした。')
+      console.error('Could not find `databases` property.')
       process.exit(1)
     }
 
@@ -63,7 +63,7 @@ program
       .getInitializer()
 
     if (!databasesInitializer || !databasesInitializer.isKind(SyntaxKind.ObjectLiteralExpression)) {
-      console.error('`databases` の初期化がオブジェクトリテラルではありません。')
+      console.error('The initializer of `databases` is not an object literal.')
       process.exit(1)
     }
 
