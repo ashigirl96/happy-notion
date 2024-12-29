@@ -1,7 +1,6 @@
-// tests/addClass.test.ts
 import { describe, expect, it } from 'bun:test'
 import { addClass } from '@/generate/addClass'
-import { Project, ScriptTarget } from 'ts-morph'
+import { type Block, Project, ScriptTarget } from 'ts-morph'
 
 describe('addClass Function', () => {
   it('should add a class with the specified properties and constructor', () => {
@@ -62,27 +61,23 @@ describe('addClass Function', () => {
       const constructor = classDeclaration.getConstructors()[0]
       expect(constructor).toBeDefined()
 
-      if (constructor) {
-        // パラメータの確認
-        const params = constructor.getParameters()
-        expect(params.length).toBe(1)
-        expect(params[0].getName()).toBe('client')
-        expect(params[0].getType().getText()).toBe('Client')
+      // パラメータの確認
+      const params = constructor.getParameters()
+      expect(params.length).toBe(1)
+      expect(params[0].getName()).toBe('client')
+      expect(params[0].getType().getText()).toBe('Client')
 
-        // コンストラクタ内のステートメント確認
-        const statements = constructor
-          .getBody()
-          ?.getStatements()
-          .map((stmt: { getText: () => any }) => stmt.getText())
-        expect(statements).toContain('super(client)')
+      // コンストラクタ内のステートメント確認
+      const body = constructor.getBody() as Block | undefined
+      const statements = body?.getStatements().map((stmt) => stmt.getText())
+      expect(statements).toContain('super(client)')
 
-        // ドキュメントコメントの確認
-        const docs = constructor.getJsDocs()
-        expect(docs.length).toBe(1)
-        expect(docs[0].getComment()).toBe(
-          '// biome-ignore lint/complexity/noUselessConstructor: <explanation>',
-        )
-      }
+      // ドキュメントコメントの確認
+      const docs = constructor.getJsDocs()
+      expect(docs.length).toBe(1)
+      expect(docs[0].getComment()).toBe(
+        '// biome-ignore lint/complexity/noUselessConstructor: <explanation>',
+      )
     }
   })
 })
