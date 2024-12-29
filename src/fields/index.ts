@@ -37,10 +37,10 @@ export type Condition<T> = T extends TextField | RichTextField | UrlField
 type ExcludedKeys = 'id' | 'save' | 'findBy'
 export type BlockObjectRequest = Exclude<CreatePageParameters['children'], undefined>[0]
 export type SaveCriteria<T> = {
-  update?: {
-    pageId: string
+  options?: {
     isAppendChildren: (client: Client) => Promise<boolean>
   }
+  where?: FindCriteria<T>
   emoji?: Extract<CreatePageParameters['icon'], { type?: 'emoji' }>['emoji']
   children?: BlockObjectRequest[]
   properties: {

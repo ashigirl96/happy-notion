@@ -17,28 +17,22 @@ export abstract class AbstractDatabase<T> {
   }
 
   async savePage(criteria: SaveCriteria<T>) {
-    const { update } = criteria
-    if (update) {
-      const response = await this.client.pages.update({
-        page_id: update.pageId,
-        icon: criteria.emoji && {
-          type: 'emoji',
-          emoji: criteria.emoji,
-        },
-        properties: criteria.properties,
-      })
-      const isAppendChildren = await update.isAppendChildren(this.client)
-      if (isAppendChildren && criteria.children !== undefined) {
-        await this.client.blocks.children.append({
-          block_id: update.pageId,
-          children: criteria.children,
-        })
-      }
-      console.dir(response, { depth: null })
-      return {
-        url: toNotionURL(update.pageId),
-      }
+    const { options, where } = criteria
+    if (where === undefined || options === undefined) {
+      return this.createPage(criteria)
     }
+    const exists = await this.findBy(where)
+    if (exists.length === 0) {
+      return this.createPage(criteria)
+    }
+    if (exists.length > 1) {
+      // TODO: ちゃんとしたエラー処理を追加する
+      throw new Error('Multiple pages found')
+    }
+    return this.updatePage(criteria, exists[0].id)
+  }
+
+  private async createPage(criteria: SaveCriteria<T>) {
     const response = await this.client.pages.create({
       parent: {
         database_id: this.id,
@@ -50,9 +44,30 @@ export abstract class AbstractDatabase<T> {
       children: criteria.children,
       properties: criteria.properties,
     })
-    console.dir(response, { depth: null })
     return {
       url: toNotionURL(response.id),
+    }
+  }
+
+  private async updatePage(criteria: SaveCriteria<T>, pageId: string) {
+    const { options } = criteria
+    const _response = await this.client.pages.update({
+      page_id: pageId,
+      icon: criteria.emoji && {
+        type: 'emoji',
+        emoji: criteria.emoji,
+      },
+      properties: criteria.properties,
+    })
+    const isAppendChildren = await options.isAppendChildren(this.client)
+    if (isAppendChildren && criteria.children !== undefined) {
+      await this.client.blocks.children.append({
+        block_id: pageId,
+        children: criteria.children,
+      })
+    }
+    return {
+      url: toNotionURL(pageId),
     }
   }
 }
