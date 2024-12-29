@@ -17,7 +17,7 @@ program
   .command('generate')
   .description('Generate configuration from notion.config.ts')
   .option('-c, --config <path>', 'Path to notion.config.ts', 'notion.config.ts')
-  .action((options) => {
+  .action(async (options) => {
     const configPath = path.resolve(process.cwd(), options.config)
 
     if (!fs.existsSync(configPath)) {
@@ -105,7 +105,7 @@ program
       console.error('Invalid configuration:', rawConfig.error.errors)
       process.exit(1)
     }
-    main(rawConfig.data, evaluatedConfig.data)
+    await main(rawConfig.data, evaluatedConfig.data)
   })
 
 // コマンドライン引数の解析
