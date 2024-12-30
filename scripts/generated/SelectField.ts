@@ -1,5 +1,8 @@
-export class SelectField {
+import { BaseField } from "@/fields/base";
+
+export class SelectField extends BaseField<"select"> {
     constructor(readonly property: string) {
+        super()
     }
 
     equals(value: string) {

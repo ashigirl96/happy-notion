@@ -1,5 +1,8 @@
-export class MultiSelectField {
+import { BaseField } from "@/fields/base";
+
+export class MultiSelectField extends BaseField<"multi_select"> {
     constructor(readonly property: string) {
+        super()
     }
 
     contains(value: string) {

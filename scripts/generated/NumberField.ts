@@ -1,5 +1,8 @@
-export class NumberField {
+import { BaseField } from "@/fields/base";
+
+export class NumberField extends BaseField<"number"> {
     constructor(readonly property: string) {
+        super()
     }
 
     equals(value: number) {

@@ -1,5 +1,8 @@
-export class CheckboxField {
+import { BaseField } from "@/fields/base";
+
+export class CheckboxField extends BaseField<"checkbox"> {
     constructor(readonly property: string) {
+        super()
     }
 
     equals(value: boolean) {

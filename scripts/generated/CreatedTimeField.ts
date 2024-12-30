@@ -1,5 +1,8 @@
-export class CreatedTimeField {
+import { BaseField } from "@/fields/base";
+
+export class CreatedTimeField extends BaseField<"created_time"> {
     constructor(readonly property: string) {
+        super()
     }
 
     equals(value: string) {

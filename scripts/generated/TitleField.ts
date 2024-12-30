@@ -1,5 +1,8 @@
-export class TitleField {
+import { BaseField } from "@/fields/base";
+
+export class TitleField extends BaseField<"title"> {
     constructor(readonly property: string) {
+        super()
     }
 
     equals(value: string) {

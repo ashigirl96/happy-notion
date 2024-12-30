@@ -1,5 +1,8 @@
-export class CreatedByField {
+import { BaseField } from "@/fields/base";
+
+export class CreatedByField extends BaseField<"created_by"> {
     constructor(readonly property: string) {
+        super()
     }
 
     contains(value: string) {

@@ -1,5 +1,8 @@
-export class PhoneNumberField {
+import { BaseField } from "@/fields/base";
+
+export class PhoneNumberField extends BaseField<"phone_number"> {
     constructor(readonly property: string) {
+        super()
     }
 
     equals(value: string) {

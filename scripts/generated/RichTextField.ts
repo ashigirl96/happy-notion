@@ -1,5 +1,8 @@
-export class RichTextField {
+import { BaseField } from "@/fields/base";
+
+export class RichTextField extends BaseField<"rich_text"> {
     constructor(readonly property: string) {
+        super()
     }
 
     equals(value: string) {

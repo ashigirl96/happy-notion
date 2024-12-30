@@ -1,5 +1,8 @@
-export class PeopleField {
+import { BaseField } from "@/fields/base";
+
+export class PeopleField extends BaseField<"people"> {
     constructor(readonly property: string) {
+        super()
     }
 
     contains(value: string) {

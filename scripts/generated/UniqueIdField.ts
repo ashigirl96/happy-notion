@@ -1,5 +1,8 @@
-export class UniqueIdField {
+import { BaseField } from "@/fields/base";
+
+export class UniqueIdField extends BaseField<"unique_id"> {
     constructor(readonly property: string) {
+        super()
     }
 
     equals(value: number) {

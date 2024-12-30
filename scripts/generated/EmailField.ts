@@ -1,5 +1,8 @@
-export class EmailField {
+import { BaseField } from "@/fields/base";
+
+export class EmailField extends BaseField<"email"> {
     constructor(readonly property: string) {
+        super()
     }
 
     equals(value: string) {

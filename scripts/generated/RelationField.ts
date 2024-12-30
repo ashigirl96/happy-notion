@@ -1,5 +1,8 @@
-export class RelationField {
+import { BaseField } from "@/fields/base";
+
+export class RelationField extends BaseField<"relation"> {
     constructor(readonly property: string) {
+        super()
     }
 
     contains(value: string) {

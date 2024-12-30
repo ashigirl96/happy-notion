@@ -1,5 +1,8 @@
-export class UrlField {
+import { BaseField } from "@/fields/base";
+
+export class UrlField extends BaseField<"url"> {
     constructor(readonly property: string) {
+        super()
     }
 
     equals(value: string) {

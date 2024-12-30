@@ -1,5 +1,8 @@
-export class LastEditedTimeField {
+import { BaseField } from "@/fields/base";
+
+export class LastEditedTimeField extends BaseField<"last_edited_time"> {
     constructor(readonly property: string) {
+        super()
     }
 
     equals(value: string) {

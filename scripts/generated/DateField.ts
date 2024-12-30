@@ -1,5 +1,8 @@
-export class DateField {
+import { BaseField } from "@/fields/base";
+
+export class DateField extends BaseField<"date"> {
     constructor(readonly property: string) {
+        super()
     }
 
     equals(value: string) {

@@ -1,7 +1,7 @@
 #!/usr/bin/env bun
 
 import * as path from 'node:path'
-import { Project, type Type } from 'ts-morph'
+import {Project, StructureKind, type Type} from 'ts-morph'
 
 // プロジェクトの初期化
 const project = new Project({
@@ -35,7 +35,6 @@ for (const unionType of propertyFilterType.getUnionTypes()) {
   if (typeProperty) {
     const declarations = typeProperty.getDeclarations()
     if (declarations.length > 0) {
-      const typeAlias = declarations[0].getType().getAliasSymbol()
       const initializer = declarations[0].getType().getLiteralValue()
       if (typeof initializer === 'string') {
         typeValue = initializer
@@ -70,11 +69,16 @@ for (const unionType of propertyFilterType.getUnionTypes()) {
   const outputFilePath = path.resolve(__dirname, `generated/${className}.ts`)
   const outputFile = project.createSourceFile(outputFilePath, '', { overwrite: true })
 
+  outputFile.addImportDeclaration({
+    namedImports: ['BaseField'],
+    moduleSpecifier: '@/fields/base',
+  })
+
   // クラスの生成
   outputFile.addClass({
     name: className,
     isExported: true,
-    // プロパティの定義を削除し、コンストラクタ引数に修飾子を追加
+    extends: `BaseField<"${typeValue}">`,
     ctors: [
       {
         parameters: [
@@ -135,12 +139,14 @@ function generateMethods(filterType: Type, filterName: string, sourceFile: any) 
     // メソッドの生成
     if (hasParam) {
       methods.push({
+        kind: StructureKind.Method,
         name: methodName,
         parameters: [{ name: 'value', type: propType.getText() }],
         statements: returnStatement,
       })
     } else {
       methods.push({
+        kind: StructureKind.Method,
         name: methodName,
         parameters: [],
         statements: returnStatement,
