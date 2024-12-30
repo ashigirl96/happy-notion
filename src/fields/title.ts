@@ -1,5 +1,5 @@
 import { BaseField, type FillValue } from '@/fields/base'
-import { richText } from './notion-sdk-js-helper'
+import { richText } from '@/fields/notion-sdk-js-helper/richTextObject'
 
 export type TitleFieldEquals = { property: string; title: { equals: string } }
 export type TitleFieldDoesNotEqual = { property: string; title: { does_not_equal: string } }
