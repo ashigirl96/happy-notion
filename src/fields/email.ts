@@ -6,14 +6,16 @@ export type EmailFieldContains = { property: string; email: { contains: string }
 export type EmailFieldDoesNotContain = { property: string; email: { does_not_contain: string } }
 export type EmailFieldStartsWith = { property: string; email: { starts_with: string } }
 export type EmailFieldEndsWith = { property: string; email: { ends_with: string } }
+export type EmailFieldIsEmpty = { property: string; email: { is_empty: true } }
+export type EmailFieldIsNotEmpty = { property: string; email: { is_not_empty: true } }
 
 export class EmailField extends BaseField<'email'> {
   constructor(readonly property: string) {
     super()
   }
 
-  fill(value: string): FillValue<'email'> {
-    return { email: value }
+  fill(email: string): FillValue<'email'> {
+    return { email }
   }
 
   equals(value: string): EmailFieldEquals {
@@ -39,6 +41,14 @@ export class EmailField extends BaseField<'email'> {
   endsWith(value: string): EmailFieldEndsWith {
     return { property: this.property, email: { ends_with: value } }
   }
+
+  isEmpty(): EmailFieldIsEmpty {
+    return { property: this.property, email: { is_empty: true } }
+  }
+
+  isNotEmpty(): EmailFieldIsNotEmpty {
+    return { property: this.property, email: { is_not_empty: true } }
+  }
 }
 
 export type EmailFieldCondition =
@@ -48,3 +58,5 @@ export type EmailFieldCondition =
   | EmailFieldDoesNotContain
   | EmailFieldStartsWith
   | EmailFieldEndsWith
+  | EmailFieldIsEmpty
+  | EmailFieldIsNotEmpty
