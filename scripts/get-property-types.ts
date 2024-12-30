@@ -65,6 +65,7 @@ for (const unionType of propertyFilterType.getUnionTypes()) {
       .getAliasSymbol()
       ?.getDeclarations()[0]
       .getType()
+      // @ts-expect-error
       .getText() || filterProperty.getType().getText()
 
   // Generating class TitleField

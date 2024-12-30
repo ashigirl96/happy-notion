@@ -63,6 +63,7 @@ for (const unionType of propertyFilterType.getUnionTypes()) {
   if (filterTypeSymbol && filterTypeSymbol.getDeclarations().length > 0) {
     filterTypeText = filterTypeSymbol.getDeclarations()[0].getType().getText()
   } else {
+    // @ts-expect-error
     filterTypeText = filterProperty.getType().getText()
   }
 
