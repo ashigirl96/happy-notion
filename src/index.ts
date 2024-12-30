@@ -1,10 +1,16 @@
 export {
-  TextField,
   RelationField,
   SelectField,
   RichTextField,
   UrlField,
   MultiSelectField,
+  CheckboxField,
+  DateField,
+  EmailField,
+  NumberField,
+  PeopleField,
+  StatusField,
+  TitleField,
 } from './fields'
 export type {
   Condition,

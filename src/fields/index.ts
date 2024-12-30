@@ -1,17 +1,26 @@
+import type { FillValue } from '@/fields/base'
+import { CheckboxField, type CheckboxFieldCondition } from '@/fields/checkbox'
+import { DateField, type DateFieldCondition } from '@/fields/date'
+import { EmailField, type EmailFieldCondition } from '@/fields/email'
+import { NumberField, type NumberFieldCondition } from '@/fields/number'
+import { PeopleField, type PeopleFieldCondition } from '@/fields/people'
+import { StatusField, type StatusFieldCondition } from '@/fields/status'
+import { TitleField, type TitleFieldCondition } from '@/fields/title'
 import type { Client } from '@notionhq/client'
 import type { CreatePageParameters } from '@notionhq/client/build/src/api-endpoints'
-import {
-  MultiSelectField,
-  type MultiSelectFieldCondition,
-  type MultiSelectFieldProperty,
-} from './multi-select'
+import { MultiSelectField, type MultiSelectFieldCondition } from './multi-select'
 import { RelationField, type RelationFieldCondition } from './relation'
-import { RichTextField, type RichTextFieldProperty } from './rich-text'
-import { SelectField, type SelectFieldCondition, type SelectFieldProperty } from './select'
-import { TextField, type TextFieldCondition, type TextFieldProperty } from './text'
-import { UrlField, type UrlFieldProperty } from './url'
+import { RichTextField, type RichTextFieldCondition } from './rich-text'
+import { SelectField, type SelectFieldCondition } from './select'
+import { UrlField, type UrlFieldCondition } from './url'
 
-export { TextField } from './text'
+export { CheckboxField } from './checkbox'
+export { DateField } from './date'
+export { EmailField } from './email'
+export { NumberField } from './number'
+export { PeopleField } from './people'
+export { StatusField } from './status'
+export { TitleField } from './title'
 export { SelectField } from './select'
 export { RelationField } from './relation'
 export { RichTextField } from './rich-text'
@@ -24,15 +33,68 @@ export type FindCriteria<T> = {
     | { and: Array<Condition<T[keyof T]>> }
     | { or: Array<Condition<T[keyof T]>> }
 }
-export type Condition<T> = T extends TextField | RichTextField | UrlField
-  ? TextFieldCondition
-  : T extends RelationField
-    ? RelationFieldCondition
-    : T extends SelectField
-      ? SelectFieldCondition
+export type Condition<T> = T extends CheckboxField
+  ? CheckboxFieldCondition
+  : T extends DateField
+    ? DateFieldCondition
+    : T extends EmailField
+      ? EmailFieldCondition
       : T extends MultiSelectField
         ? MultiSelectFieldCondition
-        : never
+        : T extends NumberField
+          ? NumberFieldCondition
+          : T extends PeopleField
+            ? PeopleFieldCondition
+            : T extends RelationField
+              ? RelationFieldCondition
+              : T extends RichTextField
+                ? RichTextFieldCondition
+                : T extends SelectField
+                  ? SelectFieldCondition
+                  : T extends StatusField
+                    ? StatusFieldCondition
+                    : T extends TitleField
+                      ? TitleFieldCondition
+                      : T extends UrlField
+                        ? UrlFieldCondition
+                        : never
+
+export const RawField = {
+  checkbox: CheckboxField.name,
+  date: DateField.name,
+  email: EmailField.name,
+  multi_select: MultiSelectField.name,
+  number: NumberField.name,
+  people: PeopleField.name,
+  relation: RelationField.name,
+  rich_text: RichTextField.name,
+  select: SelectField.name,
+  status: StatusField.name,
+  title: TitleField.name,
+  url: UrlField.name,
+} as const
+export type RawField = typeof RawField
+// 逆マッピングの定義
+type InverseRawField = {
+  [K in keyof RawField as RawField[K]]: K
+}
+
+// クラス型からクラス名を取得するユーティリティ型
+type GetFieldName<F> = F extends { name: infer N }
+  ? N extends keyof InverseRawField
+    ? N
+    : never
+  : never
+
+// FillValueForFieldの定義
+type FillValueForField<F> = GetFieldName<F> extends keyof InverseRawField
+  ? FillValue<InverseRawField[GetFieldName<F>]>
+  : never
+
+// プロパティの型定義
+type PropertiesType<T, ExcludedKeys> = {
+  [K in keyof T as K extends ExcludedKeys ? never : K]?: FillValueForField<T[K]>
+}
 
 type ExcludedKeys = 'id' | 'save' | 'findBy'
 export type BlockObjectRequest = Exclude<CreatePageParameters['children'], undefined>[0]
@@ -43,28 +105,20 @@ export type SaveCriteria<T> = {
   where?: FindCriteria<T>
   emoji?: Extract<CreatePageParameters['icon'], { type?: 'emoji' }>['emoji']
   children?: BlockObjectRequest[]
-  properties: {
-    [K in keyof T as K extends ExcludedKeys ? never : K]?: T[K] extends TextField
-      ? TextFieldProperty
-      : T[K] extends RichTextField
-        ? RichTextFieldProperty
-        : T[K] extends SelectField
-          ? SelectFieldProperty
-          : T[K] extends UrlField
-            ? UrlFieldProperty
-            : T[K] extends MultiSelectField
-              ? MultiSelectFieldProperty
-              : never
-  }
+  // properties: {
+  //   [K in keyof T as K extends ExcludedKeys ? never : K]?: T[K] extends TextField
+  //     ? TextFieldProperty
+  //     : T[K] extends RichTextField
+  //       ? RichTextFieldProperty
+  //       : T[K] extends SelectField
+  //         ? SelectFieldProperty
+  //         : T[K] extends UrlField
+  //           ? UrlFieldProperty
+  //           : T[K] extends MultiSelectField
+  //             ? MultiSelectFieldProperty
+  //             : never
+  // }
+  properties: PropertiesType<T, ExcludedKeys>
 }
 
-export const RawField = {
-  relation: RelationField.name,
-  title: TextField.name,
-  multi_select: MultiSelectField.name,
-  select: SelectField.name,
-  url: UrlField.name,
-  rich_text: RichTextField.name,
-} as const
-export type RawField = typeof RawField
 export const RawFieldKeys = Object.keys(RawField) as Array<keyof RawField>

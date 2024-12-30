@@ -5,10 +5,10 @@ import { databases } from './generated'
 async function create() {
   const response = await databases.Tasks.savePage({
     properties: {
-      Name: databases.Tasks.Name.fill({ text: 'test1', annotation: { bold: true } }),
-      Text: {
-        rich_text: [richText('test3', { underline: true }), richText('test4', { underline: true })],
-      },
+      Name: databases.Tasks.Name.fill('test1'),
+      Text: databases.Tasks.Text.fill({ text: 'test3' }),
+      MultiSelect: databases.Tasks.MultiSelect.fill(['test10']),
+      TextDecoder: 'hoge',
     },
   })
   if (response.isOk()) {
