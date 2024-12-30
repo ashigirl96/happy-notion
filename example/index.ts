@@ -1,4 +1,3 @@
-import {} from '@sota1235/notion-sdk-js-helper'
 import { richText } from '@sota1235/notion-sdk-js-helper/dist/richTextObject'
 import { databases } from './generated'
 
@@ -8,7 +7,7 @@ async function create() {
       Name: databases.Tasks.Name.fill('test1'),
       Text: databases.Tasks.Text.fill({ text: 'test3' }),
       MultiSelect: databases.Tasks.MultiSelect.fill(['test10']),
-      TextDecoder: 'hoge',
+      Select: databases.Tasks.Select.fill('test10'),
     },
   })
   if (response.isOk()) {
