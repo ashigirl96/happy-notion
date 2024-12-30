@@ -1,23 +1,20 @@
 import { BaseField } from "@/fields/base";
 
+export type PeopleFieldContains = { property: string; people: { contains: string } };
+export type PeopleFieldDoesNotContain = { property: string; people: { does_not_contain: string } };
+
 export class PeopleField extends BaseField<"people"> {
     constructor(readonly property: string) {
         super()
     }
 
-    contains(value: string) {
-        return { people: { contains: value, property: this.property } };
+    contains(value: string): PeopleFieldContains {
+        return { property: this.property, people: { contains: value } };
     }
 
-    doesNotContain(value: string) {
-        return { people: { does_not_contain: value, property: this.property } };
-    }
-
-    isEmpty() {
-        return { people: { is_empty: true, property: this.property } };
-    }
-
-    isNotEmpty() {
-        return { people: { is_not_empty: true, property: this.property } };
+    doesNotContain(value: string): PeopleFieldDoesNotContain {
+        return { property: this.property, people: { does_not_contain: value } };
     }
 }
+
+export type PeopleFieldCondition = PeopleFieldContains | PeopleFieldDoesNotContain;

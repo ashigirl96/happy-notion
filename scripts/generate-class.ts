@@ -1,11 +1,11 @@
 #!/usr/bin/env bun
 
 import * as path from 'node:path'
-import {Project, StructureKind, type Type} from 'ts-morph'
+import { Project, StructureKind, type Type } from 'ts-morph'
+import * as fs from 'fs'
 
 // プロジェクトの初期化
-const project = new Project({
-})
+const project = new Project({})
 
 // 解析対象のファイルパス
 const inputFilePath = path.resolve(
@@ -15,6 +15,12 @@ const inputFilePath = path.resolve(
 
 // ファイルをプロジェクトに追加
 const sourceFile = project.addSourceFileAtPath(inputFilePath)
+
+// 出力ディレクトリの作成（存在しない場合）
+const outputDir = path.resolve(__dirname, 'generated')
+if (!fs.existsSync(outputDir)) {
+  fs.mkdirSync(outputDir, { recursive: true })
+}
 
 // PropertyFilter型の取得
 const propertyFilterType = sourceFile.getTypeAliasOrThrow('PropertyFilter').getType()
@@ -63,15 +69,21 @@ for (const unionType of propertyFilterType.getUnionTypes()) {
   // フィルター型の詳細を取得
   const filterTypeDeclaration = sourceFile.getTypeAliasOrThrow(filterTypeText).getType()
 
-  // メソッドの生成
-  const methods = generateMethods(filterTypeDeclaration, filterName, sourceFile)
+  // メソッドと型の生成
+  const { methods, typeDefinitions } = generateMethods(className, filterTypeDeclaration, filterName)
 
   const outputFilePath = path.resolve(__dirname, `generated/${className}.ts`)
   const outputFile = project.createSourceFile(outputFilePath, '', { overwrite: true })
 
+  // BaseFieldのインポートを追加
   outputFile.addImportDeclaration({
     namedImports: ['BaseField'],
     moduleSpecifier: '@/fields/base',
+  })
+
+  // 型定義の追加
+  typeDefinitions.forEach(typeDef => {
+    outputFile.addTypeAlias(typeDef)
   })
 
   // クラスの生成
@@ -85,16 +97,26 @@ for (const unionType of propertyFilterType.getUnionTypes()) {
           {
             name: 'property',
             type: 'string',
-            isReadonly: true,
             hasQuestionToken: false,
-            scope: undefined,
+            isReadonly: true,
           },
         ],
         statements: ['super()'],
-      }
+      },
     ],
     methods: methods,
   })
+
+  // 条件型の生成
+  if (typeDefinitions.length > 0) {
+    const conditionTypeName = `${className}Condition`
+    const conditionType = {
+      name: conditionTypeName,
+      isExported: true,
+      type: typeDefinitions.map(typeDef => typeDef.name).join(' | '),
+    }
+    outputFile.addTypeAlias(conditionType)
+  }
 
   // ファイルの保存
   outputFile.saveSync()
@@ -108,8 +130,14 @@ function toPascalCase(str: string): string {
     .join('')
 }
 
-function generateMethods(filterType: Type, filterName: string, sourceFile: any) {
+function toCamelCase(str: string): string {
+  const pascal = toPascalCase(str)
+  return pascal.charAt(0).toLowerCase() + pascal.slice(1)
+}
+
+function generateMethods(className: string, filterType: Type, filterName: string) {
   const methods: any[] = []
+  const typeDefinitions: any[] = []
 
   for (const subType of filterType.getUnionTypes()) {
     if (!subType.isObject()) continue
@@ -119,40 +147,68 @@ function generateMethods(filterType: Type, filterName: string, sourceFile: any) 
 
     const prop = properties[0]
     const propName = prop.getName()
-    const propType = prop.getTypeAtLocation(sourceFile)
+    const declarations = prop.getDeclarations()
+    if (declarations.length === 0) continue // 宣言が存在しない場合はスキップ
 
-    // メソッド名の決定
-    let methodName = toPascalCase(propName).charAt(0).toLowerCase() + toPascalCase(propName).slice(1)
+// 宣言から型を取得
+    const propType = declarations[0].getType()
+
+    if (
+      !(
+        propType.isString() ||
+        propType.isNumber() ||
+        propType.isBoolean()
+      )
+    ) {
+      // プリミティブ型でない場合、メソッドと型定義を生成しない
+      continue
+    }
+
+    // メソッド名の決定（camelCaseに変換）
+    let methodName = toCamelCase(propName)
 
     // パラメータの有無
     const hasParam = propType.getText() !== 'true'
 
+    // 型名の決定
+    const typeName = `${className}${toPascalCase(propName)}`
+
+    // 戻り値の型定義
+    const typeAlias = hasParam
+      ? {
+        name: typeName,
+        isExported: true,
+        type: `{ property: string; ${filterName}: { ${propName}: ${propType.getText()} } }`,
+      }
+      : {
+        name: typeName,
+        isExported: true,
+        type: `{ property: string; ${filterName}: { ${propName}: true } }`,
+      }
+
+    typeDefinitions.push(typeAlias)
+
+    // 戻り値の型名
+    const returnType = typeName
+
     // 戻り値のオブジェクト構造
-    // 例: { title: { equals: value, property: this.property } }
-    let returnStatement: string
-    if (hasParam) {
-      returnStatement = `return { ${filterName}: { ${propName}: value, property: this.property } };`
-    } else {
-      returnStatement = `return { ${filterName}: { ${propName}: true, property: this.property } };`
-    }
+    const returnStatement = hasParam
+      ? `return { property: this.property, ${filterName}: { ${propName}: value } };`
+      : `return { property: this.property, ${filterName}: { ${propName}: true } };`
 
     // メソッドの生成
-    if (hasParam) {
-      methods.push({
-        kind: StructureKind.Method,
-        name: methodName,
-        parameters: [{ name: 'value', type: propType.getText() }],
-        statements: returnStatement,
-      })
-    } else {
-      methods.push({
-        kind: StructureKind.Method,
-        name: methodName,
-        parameters: [],
-        statements: returnStatement,
-      })
+    const method = {
+      kind: StructureKind.Method,
+      name: methodName,
+      returnType: returnType,
+      parameters: hasParam
+        ? [{ name: 'value', type: propType.getText() }]
+        : [],
+      statements: returnStatement,
     }
+
+    methods.push(method)
   }
 
-  return methods
+  return { methods, typeDefinitions }
 }

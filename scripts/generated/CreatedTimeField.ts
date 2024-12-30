@@ -1,63 +1,35 @@
 import { BaseField } from "@/fields/base";
 
+export type CreatedTimeFieldEquals = { property: string; created_time: { equals: string } };
+export type CreatedTimeFieldBefore = { property: string; created_time: { before: string } };
+export type CreatedTimeFieldAfter = { property: string; created_time: { after: string } };
+export type CreatedTimeFieldOnOrBefore = { property: string; created_time: { on_or_before: string } };
+export type CreatedTimeFieldOnOrAfter = { property: string; created_time: { on_or_after: string } };
+
 export class CreatedTimeField extends BaseField<"created_time"> {
     constructor(readonly property: string) {
         super()
     }
 
-    equals(value: string) {
-        return { created_time: { equals: value, property: this.property } };
+    equals(value: string): CreatedTimeFieldEquals {
+        return { property: this.property, created_time: { equals: value } };
     }
 
-    before(value: string) {
-        return { created_time: { before: value, property: this.property } };
+    before(value: string): CreatedTimeFieldBefore {
+        return { property: this.property, created_time: { before: value } };
     }
 
-    after(value: string) {
-        return { created_time: { after: value, property: this.property } };
+    after(value: string): CreatedTimeFieldAfter {
+        return { property: this.property, created_time: { after: value } };
     }
 
-    onOrBefore(value: string) {
-        return { created_time: { on_or_before: value, property: this.property } };
+    onOrBefore(value: string): CreatedTimeFieldOnOrBefore {
+        return { property: this.property, created_time: { on_or_before: value } };
     }
 
-    onOrAfter(value: string) {
-        return { created_time: { on_or_after: value, property: this.property } };
-    }
-
-    thisWeek(value: EmptyObject) {
-        return { created_time: { this_week: value, property: this.property } };
-    }
-
-    pastWeek(value: EmptyObject) {
-        return { created_time: { past_week: value, property: this.property } };
-    }
-
-    pastMonth(value: EmptyObject) {
-        return { created_time: { past_month: value, property: this.property } };
-    }
-
-    pastYear(value: EmptyObject) {
-        return { created_time: { past_year: value, property: this.property } };
-    }
-
-    nextWeek(value: EmptyObject) {
-        return { created_time: { next_week: value, property: this.property } };
-    }
-
-    nextMonth(value: EmptyObject) {
-        return { created_time: { next_month: value, property: this.property } };
-    }
-
-    nextYear(value: EmptyObject) {
-        return { created_time: { next_year: value, property: this.property } };
-    }
-
-    isEmpty() {
-        return { created_time: { is_empty: true, property: this.property } };
-    }
-
-    isNotEmpty() {
-        return { created_time: { is_not_empty: true, property: this.property } };
+    onOrAfter(value: string): CreatedTimeFieldOnOrAfter {
+        return { property: this.property, created_time: { on_or_after: value } };
     }
 }
+
+export type CreatedTimeFieldCondition = CreatedTimeFieldEquals | CreatedTimeFieldBefore | CreatedTimeFieldAfter | CreatedTimeFieldOnOrBefore | CreatedTimeFieldOnOrAfter;

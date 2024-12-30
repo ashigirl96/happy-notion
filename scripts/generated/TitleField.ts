@@ -1,39 +1,40 @@
 import { BaseField } from "@/fields/base";
 
+export type TitleFieldEquals = { property: string; title: { equals: string } };
+export type TitleFieldDoesNotEqual = { property: string; title: { does_not_equal: string } };
+export type TitleFieldContains = { property: string; title: { contains: string } };
+export type TitleFieldDoesNotContain = { property: string; title: { does_not_contain: string } };
+export type TitleFieldStartsWith = { property: string; title: { starts_with: string } };
+export type TitleFieldEndsWith = { property: string; title: { ends_with: string } };
+
 export class TitleField extends BaseField<"title"> {
     constructor(readonly property: string) {
         super()
     }
 
-    equals(value: string) {
-        return { title: { equals: value, property: this.property } };
+    equals(value: string): TitleFieldEquals {
+        return { property: this.property, title: { equals: value } };
     }
 
-    doesNotEqual(value: string) {
-        return { title: { does_not_equal: value, property: this.property } };
+    doesNotEqual(value: string): TitleFieldDoesNotEqual {
+        return { property: this.property, title: { does_not_equal: value } };
     }
 
-    contains(value: string) {
-        return { title: { contains: value, property: this.property } };
+    contains(value: string): TitleFieldContains {
+        return { property: this.property, title: { contains: value } };
     }
 
-    doesNotContain(value: string) {
-        return { title: { does_not_contain: value, property: this.property } };
+    doesNotContain(value: string): TitleFieldDoesNotContain {
+        return { property: this.property, title: { does_not_contain: value } };
     }
 
-    startsWith(value: string) {
-        return { title: { starts_with: value, property: this.property } };
+    startsWith(value: string): TitleFieldStartsWith {
+        return { property: this.property, title: { starts_with: value } };
     }
 
-    endsWith(value: string) {
-        return { title: { ends_with: value, property: this.property } };
-    }
-
-    isEmpty() {
-        return { title: { is_empty: true, property: this.property } };
-    }
-
-    isNotEmpty() {
-        return { title: { is_not_empty: true, property: this.property } };
+    endsWith(value: string): TitleFieldEndsWith {
+        return { property: this.property, title: { ends_with: value } };
     }
 }
+
+export type TitleFieldCondition = TitleFieldEquals | TitleFieldDoesNotEqual | TitleFieldContains | TitleFieldDoesNotContain | TitleFieldStartsWith | TitleFieldEndsWith;

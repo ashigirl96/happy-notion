@@ -1,23 +1,20 @@
 import { BaseField } from "@/fields/base";
 
+export type CreatedByFieldContains = { property: string; created_by: { contains: string } };
+export type CreatedByFieldDoesNotContain = { property: string; created_by: { does_not_contain: string } };
+
 export class CreatedByField extends BaseField<"created_by"> {
     constructor(readonly property: string) {
         super()
     }
 
-    contains(value: string) {
-        return { created_by: { contains: value, property: this.property } };
+    contains(value: string): CreatedByFieldContains {
+        return { property: this.property, created_by: { contains: value } };
     }
 
-    doesNotContain(value: string) {
-        return { created_by: { does_not_contain: value, property: this.property } };
-    }
-
-    isEmpty() {
-        return { created_by: { is_empty: true, property: this.property } };
-    }
-
-    isNotEmpty() {
-        return { created_by: { is_not_empty: true, property: this.property } };
+    doesNotContain(value: string): CreatedByFieldDoesNotContain {
+        return { property: this.property, created_by: { does_not_contain: value } };
     }
 }
+
+export type CreatedByFieldCondition = CreatedByFieldContains | CreatedByFieldDoesNotContain;

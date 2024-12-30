@@ -1,23 +1,20 @@
 import { BaseField } from "@/fields/base";
 
+export type RelationFieldContains = { property: string; relation: { contains: string } };
+export type RelationFieldDoesNotContain = { property: string; relation: { does_not_contain: string } };
+
 export class RelationField extends BaseField<"relation"> {
     constructor(readonly property: string) {
         super()
     }
 
-    contains(value: string) {
-        return { relation: { contains: value, property: this.property } };
+    contains(value: string): RelationFieldContains {
+        return { property: this.property, relation: { contains: value } };
     }
 
-    doesNotContain(value: string) {
-        return { relation: { does_not_contain: value, property: this.property } };
-    }
-
-    isEmpty() {
-        return { relation: { is_empty: true, property: this.property } };
-    }
-
-    isNotEmpty() {
-        return { relation: { is_not_empty: true, property: this.property } };
+    doesNotContain(value: string): RelationFieldDoesNotContain {
+        return { property: this.property, relation: { does_not_contain: value } };
     }
 }
+
+export type RelationFieldCondition = RelationFieldContains | RelationFieldDoesNotContain;

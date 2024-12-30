@@ -1,39 +1,40 @@
 import { BaseField } from "@/fields/base";
 
+export type NumberFieldEquals = { property: string; number: { equals: number } };
+export type NumberFieldDoesNotEqual = { property: string; number: { does_not_equal: number } };
+export type NumberFieldGreaterThan = { property: string; number: { greater_than: number } };
+export type NumberFieldLessThan = { property: string; number: { less_than: number } };
+export type NumberFieldGreaterThanOrEqualTo = { property: string; number: { greater_than_or_equal_to: number } };
+export type NumberFieldLessThanOrEqualTo = { property: string; number: { less_than_or_equal_to: number } };
+
 export class NumberField extends BaseField<"number"> {
     constructor(readonly property: string) {
         super()
     }
 
-    equals(value: number) {
-        return { number: { equals: value, property: this.property } };
+    equals(value: number): NumberFieldEquals {
+        return { property: this.property, number: { equals: value } };
     }
 
-    doesNotEqual(value: number) {
-        return { number: { does_not_equal: value, property: this.property } };
+    doesNotEqual(value: number): NumberFieldDoesNotEqual {
+        return { property: this.property, number: { does_not_equal: value } };
     }
 
-    greaterThan(value: number) {
-        return { number: { greater_than: value, property: this.property } };
+    greaterThan(value: number): NumberFieldGreaterThan {
+        return { property: this.property, number: { greater_than: value } };
     }
 
-    lessThan(value: number) {
-        return { number: { less_than: value, property: this.property } };
+    lessThan(value: number): NumberFieldLessThan {
+        return { property: this.property, number: { less_than: value } };
     }
 
-    greaterThanOrEqualTo(value: number) {
-        return { number: { greater_than_or_equal_to: value, property: this.property } };
+    greaterThanOrEqualTo(value: number): NumberFieldGreaterThanOrEqualTo {
+        return { property: this.property, number: { greater_than_or_equal_to: value } };
     }
 
-    lessThanOrEqualTo(value: number) {
-        return { number: { less_than_or_equal_to: value, property: this.property } };
-    }
-
-    isEmpty() {
-        return { number: { is_empty: true, property: this.property } };
-    }
-
-    isNotEmpty() {
-        return { number: { is_not_empty: true, property: this.property } };
+    lessThanOrEqualTo(value: number): NumberFieldLessThanOrEqualTo {
+        return { property: this.property, number: { less_than_or_equal_to: value } };
     }
 }
+
+export type NumberFieldCondition = NumberFieldEquals | NumberFieldDoesNotEqual | NumberFieldGreaterThan | NumberFieldLessThan | NumberFieldGreaterThanOrEqualTo | NumberFieldLessThanOrEqualTo;

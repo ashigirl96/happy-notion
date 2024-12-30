@@ -1,39 +1,40 @@
 import { BaseField } from "@/fields/base";
 
+export type PhoneNumberFieldEquals = { property: string; phone_number: { equals: string } };
+export type PhoneNumberFieldDoesNotEqual = { property: string; phone_number: { does_not_equal: string } };
+export type PhoneNumberFieldContains = { property: string; phone_number: { contains: string } };
+export type PhoneNumberFieldDoesNotContain = { property: string; phone_number: { does_not_contain: string } };
+export type PhoneNumberFieldStartsWith = { property: string; phone_number: { starts_with: string } };
+export type PhoneNumberFieldEndsWith = { property: string; phone_number: { ends_with: string } };
+
 export class PhoneNumberField extends BaseField<"phone_number"> {
     constructor(readonly property: string) {
         super()
     }
 
-    equals(value: string) {
-        return { phone_number: { equals: value, property: this.property } };
+    equals(value: string): PhoneNumberFieldEquals {
+        return { property: this.property, phone_number: { equals: value } };
     }
 
-    doesNotEqual(value: string) {
-        return { phone_number: { does_not_equal: value, property: this.property } };
+    doesNotEqual(value: string): PhoneNumberFieldDoesNotEqual {
+        return { property: this.property, phone_number: { does_not_equal: value } };
     }
 
-    contains(value: string) {
-        return { phone_number: { contains: value, property: this.property } };
+    contains(value: string): PhoneNumberFieldContains {
+        return { property: this.property, phone_number: { contains: value } };
     }
 
-    doesNotContain(value: string) {
-        return { phone_number: { does_not_contain: value, property: this.property } };
+    doesNotContain(value: string): PhoneNumberFieldDoesNotContain {
+        return { property: this.property, phone_number: { does_not_contain: value } };
     }
 
-    startsWith(value: string) {
-        return { phone_number: { starts_with: value, property: this.property } };
+    startsWith(value: string): PhoneNumberFieldStartsWith {
+        return { property: this.property, phone_number: { starts_with: value } };
     }
 
-    endsWith(value: string) {
-        return { phone_number: { ends_with: value, property: this.property } };
-    }
-
-    isEmpty() {
-        return { phone_number: { is_empty: true, property: this.property } };
-    }
-
-    isNotEmpty() {
-        return { phone_number: { is_not_empty: true, property: this.property } };
+    endsWith(value: string): PhoneNumberFieldEndsWith {
+        return { property: this.property, phone_number: { ends_with: value } };
     }
 }
+
+export type PhoneNumberFieldCondition = PhoneNumberFieldEquals | PhoneNumberFieldDoesNotEqual | PhoneNumberFieldContains | PhoneNumberFieldDoesNotContain | PhoneNumberFieldStartsWith | PhoneNumberFieldEndsWith;
