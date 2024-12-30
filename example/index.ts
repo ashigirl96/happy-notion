@@ -1,4 +1,3 @@
-import { richText } from '@sota1235/notion-sdk-js-helper/dist/richTextObject'
 import { databases } from './generated'
 
 async function create() {
@@ -8,13 +7,19 @@ async function create() {
       Text: databases.Tasks.Text.fill({ text: 'test3' }),
       MultiSelect: databases.Tasks.MultiSelect.fill(['test10']),
       Select: databases.Tasks.Select.fill('test10'),
+      Checkbox: databases.Tasks.Checkbox.fill(true),
+      Number: databases.Tasks.Number.fill(10),
+      URL: databases.Tasks.URL.fill('https://example.com'),
+      Status: databases.Tasks.Status.fill('In progress'),
+      Date: databases.Tasks.Date.fill({
+        start: new Date('2025-01-01').toISOString(),
+        end: null,
+      }),
     },
   })
   if (response.isOk()) {
     console.log(response.value)
   }
-
-  richText('test1', {})
 }
 
 async function findBy() {
