@@ -1,3 +1,4 @@
+import type { AbstractDatabaseProperty } from '@/core/types'
 import type { FillValue } from '@/fields/base'
 import { CheckboxField, type CheckboxFieldCondition } from '@/fields/checkbox'
 import { DateField, type DateFieldCondition } from '@/fields/date'
@@ -96,7 +97,7 @@ type PropertiesType<T, ExcludedKeys> = {
   [K in keyof T as K extends ExcludedKeys ? never : K]?: FillValueForField<T[K]>
 }
 
-type ExcludedKeys = 'id' | 'save' | 'findBy'
+type ExcludedKeys<T> = AbstractDatabaseProperty<T>
 export type BlockObjectRequest = Exclude<CreatePageParameters['children'], undefined>[0]
 export type SaveCriteria<T> = {
   options?: {
@@ -118,7 +119,7 @@ export type SaveCriteria<T> = {
   //             ? MultiSelectFieldProperty
   //             : never
   // }
-  properties: PropertiesType<T, ExcludedKeys>
+  properties: PropertiesType<T, ExcludedKeys<T>>
 }
 
 export const RawFieldKeys = Object.keys(RawField) as Array<keyof RawField>

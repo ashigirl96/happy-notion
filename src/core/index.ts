@@ -19,7 +19,6 @@ export abstract class AbstractDatabase<T> {
       (async () => {
         const response = await this.client.databases.query({
           database_id: this.id,
-          // @ts-expect-error
           filter: criteria.where,
         })
         return response.results
