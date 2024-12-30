@@ -54,16 +54,16 @@ export type TextFieldIsNotEmpty = {
   }
 }
 
-type Fill = Parameters<typeof richText>[0]
+type Fill = string
 
-export class TextField extends BaseField<TextFieldProperty, Fill> {
+export class TextField extends BaseField<'title', Fill> {
   constructor(readonly content: string) {
-    super(content)
+    super()
   }
 
-  fill(value: Fill): TextFieldProperty {
+  fill(value: Fill) {
     return {
-      title: [richText(value)],
+      title: [richText({ text: value })],
     }
   }
 

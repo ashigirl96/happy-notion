@@ -1,5 +1,21 @@
-export abstract class BaseField<TProperty, TValue> {
-  protected constructor(readonly content: string) {}
+import type { CreatePageParameters } from '@notionhq/client/build/src/api-endpoints'
 
-  abstract fill(value: TValue): TProperty
+type Kind = CreatePageParameters['properties'] extends Record<string, infer U>
+  ? U extends { type?: infer V }
+    ? V extends string
+      ? V
+      : never
+    : never
+  : never
+
+type Value<T> = CreatePageParameters['properties'] extends Record<string, infer U>
+  ? U extends { type?: T }
+    ? U
+    : never
+  : never
+
+export abstract class BaseField<K extends Kind, TValue> {
+  protected constructor() {}
+
+  abstract fill(value: TValue): Value<K>
 }
