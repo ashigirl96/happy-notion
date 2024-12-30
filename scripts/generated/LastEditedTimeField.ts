@@ -11,6 +11,11 @@ export type LastEditedTimeFieldOnOrAfter = {
   property: string
   last_edited_time: { on_or_after: string }
 }
+export type LastEditedTimeFieldIsEmpty = { property: string; last_edited_time: { is_empty: true } }
+export type LastEditedTimeFieldIsNotEmpty = {
+  property: string
+  last_edited_time: { is_not_empty: true }
+}
 
 export class LastEditedTimeField extends BaseField<'last_edited_time'> {
   constructor(readonly property: string) {
@@ -40,6 +45,14 @@ export class LastEditedTimeField extends BaseField<'last_edited_time'> {
   onOrAfter(value: string): LastEditedTimeFieldOnOrAfter {
     return { property: this.property, last_edited_time: { on_or_after: value } }
   }
+
+  isEmpty(): LastEditedTimeFieldIsEmpty {
+    return { property: this.property, last_edited_time: { is_empty: true } }
+  }
+
+  isNotEmpty(): LastEditedTimeFieldIsNotEmpty {
+    return { property: this.property, last_edited_time: { is_not_empty: true } }
+  }
 }
 
 export type LastEditedTimeFieldCondition =
@@ -48,3 +61,5 @@ export type LastEditedTimeFieldCondition =
   | LastEditedTimeFieldAfter
   | LastEditedTimeFieldOnOrBefore
   | LastEditedTimeFieldOnOrAfter
+  | LastEditedTimeFieldIsEmpty
+  | LastEditedTimeFieldIsNotEmpty

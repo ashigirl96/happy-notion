@@ -8,6 +8,8 @@ export type CreatedTimeFieldOnOrBefore = {
   created_time: { on_or_before: string }
 }
 export type CreatedTimeFieldOnOrAfter = { property: string; created_time: { on_or_after: string } }
+export type CreatedTimeFieldIsEmpty = { property: string; created_time: { is_empty: true } }
+export type CreatedTimeFieldIsNotEmpty = { property: string; created_time: { is_not_empty: true } }
 
 export class CreatedTimeField extends BaseField<'created_time'> {
   constructor(readonly property: string) {
@@ -37,6 +39,14 @@ export class CreatedTimeField extends BaseField<'created_time'> {
   onOrAfter(value: string): CreatedTimeFieldOnOrAfter {
     return { property: this.property, created_time: { on_or_after: value } }
   }
+
+  isEmpty(): CreatedTimeFieldIsEmpty {
+    return { property: this.property, created_time: { is_empty: true } }
+  }
+
+  isNotEmpty(): CreatedTimeFieldIsNotEmpty {
+    return { property: this.property, created_time: { is_not_empty: true } }
+  }
 }
 
 export type CreatedTimeFieldCondition =
@@ -45,3 +55,5 @@ export type CreatedTimeFieldCondition =
   | CreatedTimeFieldAfter
   | CreatedTimeFieldOnOrBefore
   | CreatedTimeFieldOnOrAfter
+  | CreatedTimeFieldIsEmpty
+  | CreatedTimeFieldIsNotEmpty

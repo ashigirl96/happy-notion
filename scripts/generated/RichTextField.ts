@@ -9,6 +9,8 @@ export type RichTextFieldDoesNotContain = {
 }
 export type RichTextFieldStartsWith = { property: string; rich_text: { starts_with: string } }
 export type RichTextFieldEndsWith = { property: string; rich_text: { ends_with: string } }
+export type RichTextFieldIsEmpty = { property: string; rich_text: { is_empty: true } }
+export type RichTextFieldIsNotEmpty = { property: string; rich_text: { is_not_empty: true } }
 
 export class RichTextField extends BaseField<'rich_text'> {
   constructor(readonly property: string) {
@@ -42,6 +44,14 @@ export class RichTextField extends BaseField<'rich_text'> {
   endsWith(value: string): RichTextFieldEndsWith {
     return { property: this.property, rich_text: { ends_with: value } }
   }
+
+  isEmpty(): RichTextFieldIsEmpty {
+    return { property: this.property, rich_text: { is_empty: true } }
+  }
+
+  isNotEmpty(): RichTextFieldIsNotEmpty {
+    return { property: this.property, rich_text: { is_not_empty: true } }
+  }
 }
 
 export type RichTextFieldCondition =
@@ -51,3 +61,5 @@ export type RichTextFieldCondition =
   | RichTextFieldDoesNotContain
   | RichTextFieldStartsWith
   | RichTextFieldEndsWith
+  | RichTextFieldIsEmpty
+  | RichTextFieldIsNotEmpty

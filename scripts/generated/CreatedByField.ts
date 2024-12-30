@@ -5,6 +5,8 @@ export type CreatedByFieldDoesNotContain = {
   property: string
   created_by: { does_not_contain: string }
 }
+export type CreatedByFieldIsEmpty = { property: string; created_by: { is_empty: true } }
+export type CreatedByFieldIsNotEmpty = { property: string; created_by: { is_not_empty: true } }
 
 export class CreatedByField extends BaseField<'created_by'> {
   constructor(readonly property: string) {
@@ -22,6 +24,18 @@ export class CreatedByField extends BaseField<'created_by'> {
   doesNotContain(value: string): CreatedByFieldDoesNotContain {
     return { property: this.property, created_by: { does_not_contain: value } }
   }
+
+  isEmpty(): CreatedByFieldIsEmpty {
+    return { property: this.property, created_by: { is_empty: true } }
+  }
+
+  isNotEmpty(): CreatedByFieldIsNotEmpty {
+    return { property: this.property, created_by: { is_not_empty: true } }
+  }
 }
 
-export type CreatedByFieldCondition = CreatedByFieldContains | CreatedByFieldDoesNotContain
+export type CreatedByFieldCondition =
+  | CreatedByFieldContains
+  | CreatedByFieldDoesNotContain
+  | CreatedByFieldIsEmpty
+  | CreatedByFieldIsNotEmpty

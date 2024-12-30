@@ -5,6 +5,11 @@ export type LastEditedByFieldDoesNotContain = {
   property: string
   last_edited_by: { does_not_contain: string }
 }
+export type LastEditedByFieldIsEmpty = { property: string; last_edited_by: { is_empty: true } }
+export type LastEditedByFieldIsNotEmpty = {
+  property: string
+  last_edited_by: { is_not_empty: true }
+}
 
 export class LastEditedByField extends BaseField<'last_edited_by'> {
   constructor(readonly property: string) {
@@ -22,6 +27,18 @@ export class LastEditedByField extends BaseField<'last_edited_by'> {
   doesNotContain(value: string): LastEditedByFieldDoesNotContain {
     return { property: this.property, last_edited_by: { does_not_contain: value } }
   }
+
+  isEmpty(): LastEditedByFieldIsEmpty {
+    return { property: this.property, last_edited_by: { is_empty: true } }
+  }
+
+  isNotEmpty(): LastEditedByFieldIsNotEmpty {
+    return { property: this.property, last_edited_by: { is_not_empty: true } }
+  }
 }
 
-export type LastEditedByFieldCondition = LastEditedByFieldContains | LastEditedByFieldDoesNotContain
+export type LastEditedByFieldCondition =
+  | LastEditedByFieldContains
+  | LastEditedByFieldDoesNotContain
+  | LastEditedByFieldIsEmpty
+  | LastEditedByFieldIsNotEmpty

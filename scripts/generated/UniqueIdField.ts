@@ -12,6 +12,8 @@ export type UniqueIdFieldLessThanOrEqualTo = {
   property: string
   unique_id: { less_than_or_equal_to: number }
 }
+export type UniqueIdFieldIsEmpty = { property: string; unique_id: { is_empty: true } }
+export type UniqueIdFieldIsNotEmpty = { property: string; unique_id: { is_not_empty: true } }
 
 export class UniqueIdField extends BaseField<'unique_id'> {
   constructor(readonly property: string) {
@@ -45,6 +47,14 @@ export class UniqueIdField extends BaseField<'unique_id'> {
   lessThanOrEqualTo(value: number): UniqueIdFieldLessThanOrEqualTo {
     return { property: this.property, unique_id: { less_than_or_equal_to: value } }
   }
+
+  isEmpty(): UniqueIdFieldIsEmpty {
+    return { property: this.property, unique_id: { is_empty: true } }
+  }
+
+  isNotEmpty(): UniqueIdFieldIsNotEmpty {
+    return { property: this.property, unique_id: { is_not_empty: true } }
+  }
 }
 
 export type UniqueIdFieldCondition =
@@ -54,3 +64,5 @@ export type UniqueIdFieldCondition =
   | UniqueIdFieldLessThan
   | UniqueIdFieldGreaterThanOrEqualTo
   | UniqueIdFieldLessThanOrEqualTo
+  | UniqueIdFieldIsEmpty
+  | UniqueIdFieldIsNotEmpty

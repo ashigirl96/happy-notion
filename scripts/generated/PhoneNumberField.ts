@@ -12,6 +12,8 @@ export type PhoneNumberFieldDoesNotContain = {
 }
 export type PhoneNumberFieldStartsWith = { property: string; phone_number: { starts_with: string } }
 export type PhoneNumberFieldEndsWith = { property: string; phone_number: { ends_with: string } }
+export type PhoneNumberFieldIsEmpty = { property: string; phone_number: { is_empty: true } }
+export type PhoneNumberFieldIsNotEmpty = { property: string; phone_number: { is_not_empty: true } }
 
 export class PhoneNumberField extends BaseField<'phone_number'> {
   constructor(readonly property: string) {
@@ -45,6 +47,14 @@ export class PhoneNumberField extends BaseField<'phone_number'> {
   endsWith(value: string): PhoneNumberFieldEndsWith {
     return { property: this.property, phone_number: { ends_with: value } }
   }
+
+  isEmpty(): PhoneNumberFieldIsEmpty {
+    return { property: this.property, phone_number: { is_empty: true } }
+  }
+
+  isNotEmpty(): PhoneNumberFieldIsNotEmpty {
+    return { property: this.property, phone_number: { is_not_empty: true } }
+  }
 }
 
 export type PhoneNumberFieldCondition =
@@ -54,3 +64,5 @@ export type PhoneNumberFieldCondition =
   | PhoneNumberFieldDoesNotContain
   | PhoneNumberFieldStartsWith
   | PhoneNumberFieldEndsWith
+  | PhoneNumberFieldIsEmpty
+  | PhoneNumberFieldIsNotEmpty

@@ -12,6 +12,8 @@ export type NumberFieldLessThanOrEqualTo = {
   property: string
   number: { less_than_or_equal_to: number }
 }
+export type NumberFieldIsEmpty = { property: string; number: { is_empty: true } }
+export type NumberFieldIsNotEmpty = { property: string; number: { is_not_empty: true } }
 
 export class NumberField extends BaseField<'number'> {
   constructor(readonly property: string) {
@@ -45,6 +47,14 @@ export class NumberField extends BaseField<'number'> {
   lessThanOrEqualTo(value: number): NumberFieldLessThanOrEqualTo {
     return { property: this.property, number: { less_than_or_equal_to: value } }
   }
+
+  isEmpty(): NumberFieldIsEmpty {
+    return { property: this.property, number: { is_empty: true } }
+  }
+
+  isNotEmpty(): NumberFieldIsNotEmpty {
+    return { property: this.property, number: { is_not_empty: true } }
+  }
 }
 
 export type NumberFieldCondition =
@@ -54,3 +64,5 @@ export type NumberFieldCondition =
   | NumberFieldLessThan
   | NumberFieldGreaterThanOrEqualTo
   | NumberFieldLessThanOrEqualTo
+  | NumberFieldIsEmpty
+  | NumberFieldIsNotEmpty

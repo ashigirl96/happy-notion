@@ -2,6 +2,8 @@ import { BaseField, type FillValue } from '@/fields/base'
 
 export type StatusFieldEquals = { property: string; status: { equals: string } }
 export type StatusFieldDoesNotEqual = { property: string; status: { does_not_equal: string } }
+export type StatusFieldIsEmpty = { property: string; status: { is_empty: true } }
+export type StatusFieldIsNotEmpty = { property: string; status: { is_not_empty: true } }
 
 export class StatusField extends BaseField<'status'> {
   constructor(readonly property: string) {
@@ -19,6 +21,18 @@ export class StatusField extends BaseField<'status'> {
   doesNotEqual(value: string): StatusFieldDoesNotEqual {
     return { property: this.property, status: { does_not_equal: value } }
   }
+
+  isEmpty(): StatusFieldIsEmpty {
+    return { property: this.property, status: { is_empty: true } }
+  }
+
+  isNotEmpty(): StatusFieldIsNotEmpty {
+    return { property: this.property, status: { is_not_empty: true } }
+  }
 }
 
-export type StatusFieldCondition = StatusFieldEquals | StatusFieldDoesNotEqual
+export type StatusFieldCondition =
+  | StatusFieldEquals
+  | StatusFieldDoesNotEqual
+  | StatusFieldIsEmpty
+  | StatusFieldIsNotEmpty

@@ -5,6 +5,8 @@ export type MultiSelectFieldDoesNotContain = {
   property: string
   multi_select: { does_not_contain: string }
 }
+export type MultiSelectFieldIsEmpty = { property: string; multi_select: { is_empty: true } }
+export type MultiSelectFieldIsNotEmpty = { property: string; multi_select: { is_not_empty: true } }
 
 export class MultiSelectField extends BaseField<'multi_select'> {
   constructor(readonly property: string) {
@@ -22,6 +24,18 @@ export class MultiSelectField extends BaseField<'multi_select'> {
   doesNotContain(value: string): MultiSelectFieldDoesNotContain {
     return { property: this.property, multi_select: { does_not_contain: value } }
   }
+
+  isEmpty(): MultiSelectFieldIsEmpty {
+    return { property: this.property, multi_select: { is_empty: true } }
+  }
+
+  isNotEmpty(): MultiSelectFieldIsNotEmpty {
+    return { property: this.property, multi_select: { is_not_empty: true } }
+  }
 }
 
-export type MultiSelectFieldCondition = MultiSelectFieldContains | MultiSelectFieldDoesNotContain
+export type MultiSelectFieldCondition =
+  | MultiSelectFieldContains
+  | MultiSelectFieldDoesNotContain
+  | MultiSelectFieldIsEmpty
+  | MultiSelectFieldIsNotEmpty

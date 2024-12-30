@@ -76,16 +76,10 @@ for (const unionType of propertyFilterType.getUnionTypes()) {
   const outputFile = project.createSourceFile(outputFilePath, '', { overwrite: true })
 
   // BaseFieldのインポートを追加
-  // outputFile.addImportDeclaration({
-  //   namedImports: ['BaseField'],
-  //   moduleSpecifier: '@/fields/base',
-  // })
-  outputFile.addImportDeclarations([
-    {
-      namedImports: ['BaseField', 'type FillValue'],
-      moduleSpecifier: '@/fields/base',
-    },
-  ])
+  outputFile.addImportDeclaration({
+    namedImports: ['BaseField', 'type FillValue'],
+    moduleSpecifier: '@/fields/base',
+  })
 
   // 型定義の追加
   for (const typeDef of typeDefinitions) {
@@ -167,7 +161,14 @@ function generateMethods(className: string, filterType: Type, filterName: string
     // 宣言から型を取得
     const propType = declarations[0].getType()
 
-    if (!(propType.isString() || propType.isNumber() || propType.isBoolean())) {
+    if (
+      !(
+        propType.isString() ||
+        propType.isNumber() ||
+        propType.isBoolean() ||
+        propType.getText() === 'true'
+      )
+    ) {
       // プリミティブ型でない場合、メソッドと型定義を生成しない
       continue
     }

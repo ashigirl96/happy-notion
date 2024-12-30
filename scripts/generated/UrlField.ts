@@ -6,6 +6,8 @@ export type UrlFieldContains = { property: string; url: { contains: string } }
 export type UrlFieldDoesNotContain = { property: string; url: { does_not_contain: string } }
 export type UrlFieldStartsWith = { property: string; url: { starts_with: string } }
 export type UrlFieldEndsWith = { property: string; url: { ends_with: string } }
+export type UrlFieldIsEmpty = { property: string; url: { is_empty: true } }
+export type UrlFieldIsNotEmpty = { property: string; url: { is_not_empty: true } }
 
 export class UrlField extends BaseField<'url'> {
   constructor(readonly property: string) {
@@ -39,6 +41,14 @@ export class UrlField extends BaseField<'url'> {
   endsWith(value: string): UrlFieldEndsWith {
     return { property: this.property, url: { ends_with: value } }
   }
+
+  isEmpty(): UrlFieldIsEmpty {
+    return { property: this.property, url: { is_empty: true } }
+  }
+
+  isNotEmpty(): UrlFieldIsNotEmpty {
+    return { property: this.property, url: { is_not_empty: true } }
+  }
 }
 
 export type UrlFieldCondition =
@@ -48,3 +58,5 @@ export type UrlFieldCondition =
   | UrlFieldDoesNotContain
   | UrlFieldStartsWith
   | UrlFieldEndsWith
+  | UrlFieldIsEmpty
+  | UrlFieldIsNotEmpty
