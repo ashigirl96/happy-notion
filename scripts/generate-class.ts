@@ -4,7 +4,8 @@ import * as path from 'node:path'
 import { Project, type Type } from 'ts-morph'
 
 // プロジェクトの初期化
-const project = new Project({ })
+const project = new Project({
+})
 
 // 解析対象のファイルパス
 const inputFilePath = path.resolve(
@@ -14,8 +15,6 @@ const inputFilePath = path.resolve(
 
 // ファイルをプロジェクトに追加
 const sourceFile = project.addSourceFileAtPath(inputFilePath)
-
-// 出力ファイルの準備
 
 // PropertyFilter型の取得
 const propertyFilterType = sourceFile.getTypeAliasOrThrow('PropertyFilter').getType()
@@ -36,7 +35,8 @@ for (const unionType of propertyFilterType.getUnionTypes()) {
   if (typeProperty) {
     const declarations = typeProperty.getDeclarations()
     if (declarations.length > 0) {
-      const initializer = (declarations[0].getType() as Type).getLiteralValue()
+      const typeAlias = declarations[0].getType().getAliasSymbol()
+      const initializer = declarations[0].getType().getLiteralValue()
       if (typeof initializer === 'string') {
         typeValue = initializer
       }
@@ -46,10 +46,6 @@ for (const unionType of propertyFilterType.getUnionTypes()) {
   // typeが指定されていない場合はデフォルトのクラス名を使用
   const className = typeValue ? `${toPascalCase(typeValue)}Field` : 'UnknownField'
 
-  // propertyプロパティの型を取得
-  const _propertyType = unionType.getProperty('property')?.getTypeAtLocation(sourceFile)
-  // 通常はstringなのでスキップ
-
   // 対応するフィルターのプロパティ名と型を取得
   const filterProperty = properties.find(
     (p) => p.getName() !== 'property' && p.getName() !== 'type',
@@ -57,16 +53,16 @@ for (const unionType of propertyFilterType.getUnionTypes()) {
   if (!filterProperty) continue
 
   const filterName = filterProperty.getName()
-  const filterType =
-    filterProperty
-      .getTypeAtLocation(sourceFile)
-      .getAliasSymbol()
-      ?.getDeclarations()[0]
-      .getType()
-      .getText() || filterProperty.getType().getText()
+  const filterTypeSymbol = filterProperty.getTypeAtLocation(sourceFile).getAliasSymbol()
+  let filterTypeText: string
+  if (filterTypeSymbol && filterTypeSymbol.getDeclarations().length > 0) {
+    filterTypeText = filterTypeSymbol.getDeclarations()[0].getType().getText()
+  } else {
+    filterTypeText = filterProperty.getType().getText()
+  }
 
   // フィルター型の詳細を取得
-  const filterTypeDeclaration = sourceFile.getTypeAliasOrThrow(filterType).getType()
+  const filterTypeDeclaration = sourceFile.getTypeAliasOrThrow(filterTypeText).getType()
 
   // メソッドの生成
   const methods = generateMethods(filterTypeDeclaration, filterName, sourceFile)
@@ -78,29 +74,25 @@ for (const unionType of propertyFilterType.getUnionTypes()) {
   outputFile.addClass({
     name: className,
     isExported: true,
-    properties: [
+    // プロパティの定義を削除し、コンストラクタ引数に修飾子を追加
+    ctors: [
       {
-        name: 'property',
-        scope: 'private',
-        isReadonly: true,
-        type: 'string',
-      },
+        parameters: [
+          {
+            name: 'property',
+            type: 'string',
+            isReadonly: true,
+            hasQuestionToken: false,
+            scope: undefined,
+          },
+        ],
+        statements: ['super()'],
+      }
     ],
-    constructor: {
-      parameters: [
-        {
-          name: 'property',
-          type: 'string',
-          scope: undefined,
-          isReadonly: true,
-          isPrivate: true,
-        },
-      ],
-      statements: [],
-    },
     methods: methods,
   })
 
+  // ファイルの保存
   outputFile.saveSync()
 }
 
@@ -109,7 +101,7 @@ function toPascalCase(str: string): string {
   return str
     .split('_')
     .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-    .join('');
+    .join('')
 }
 
 function generateMethods(filterType: Type, filterName: string, sourceFile: any) {
@@ -126,47 +118,18 @@ function generateMethods(filterType: Type, filterName: string, sourceFile: any) 
     const propType = prop.getTypeAtLocation(sourceFile)
 
     // メソッド名の決定
-    let methodName: string
-    let _returnObject: any
-
-    switch (propName) {
-      case 'equals':
-        methodName = 'equals'
-        break
-      case 'does_not_equal':
-        methodName = 'doesNotEqual'
-        break
-      case 'contains':
-        methodName = 'contains'
-        break
-      case 'does_not_contain':
-        methodName = 'doesNotContain'
-        break
-      case 'starts_with':
-        methodName = 'startsWith'
-        break
-      case 'ends_with':
-        methodName = 'endsWith'
-        break
-      case 'is_empty':
-        methodName = 'isEmpty'
-        break
-      case 'is_not_empty':
-        methodName = 'isNotEmpty'
-        break
-      default:
-        methodName = propName
-    }
+    let methodName = toPascalCase(propName).charAt(0).toLowerCase() + toPascalCase(propName).slice(1)
 
     // パラメータの有無
     const hasParam = propType.getText() !== 'true'
 
     // 戻り値のオブジェクト構造
-    const _returnTypeObject: any = {
-      [filterName]: {
-        [propName]: hasParam ? '{value}' : true,
-        property: 'this.property',
-      },
+    // 例: { title: { equals: value, property: this.property } }
+    let returnStatement: string
+    if (hasParam) {
+      returnStatement = `return { ${filterName}: { ${propName}: value, property: this.property } };`
+    } else {
+      returnStatement = `return { ${filterName}: { ${propName}: true, property: this.property } };`
     }
 
     // メソッドの生成
@@ -174,15 +137,13 @@ function generateMethods(filterType: Type, filterName: string, sourceFile: any) 
       methods.push({
         name: methodName,
         parameters: [{ name: 'value', type: propType.getText() }],
-        returnType: 'any',
-        statements: `return { ${filterName}: { ${propName}: value, property: this.property } };`,
+        statements: returnStatement,
       })
     } else {
       methods.push({
         name: methodName,
         parameters: [],
-        returnType: 'any',
-        statements: `return { ${filterName}: { ${propName}: true, property: this.property } };`,
+        statements: returnStatement,
       })
     }
   }

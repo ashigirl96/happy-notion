@@ -1,19 +1,20 @@
 export class PeopleField {
-    private readonly property: string;
+    constructor(readonly property: string) {
+    }
 
-    contains(value: string): any {
+    contains(value: string) {
         return { people: { contains: value, property: this.property } };
     }
 
-    doesNotContain(value: string): any {
+    doesNotContain(value: string) {
         return { people: { does_not_contain: value, property: this.property } };
     }
 
-    isEmpty(): any {
+    isEmpty() {
         return { people: { is_empty: true, property: this.property } };
     }
 
-    isNotEmpty(): any {
+    isNotEmpty() {
         return { people: { is_not_empty: true, property: this.property } };
     }
 }

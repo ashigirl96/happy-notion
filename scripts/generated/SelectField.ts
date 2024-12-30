@@ -1,19 +1,20 @@
 export class SelectField {
-    private readonly property: string;
+    constructor(readonly property: string) {
+    }
 
-    equals(value: string): any {
+    equals(value: string) {
         return { select: { equals: value, property: this.property } };
     }
 
-    doesNotEqual(value: string): any {
+    doesNotEqual(value: string) {
         return { select: { does_not_equal: value, property: this.property } };
     }
 
-    isEmpty(): any {
+    isEmpty() {
         return { select: { is_empty: true, property: this.property } };
     }
 
-    isNotEmpty(): any {
+    isNotEmpty() {
         return { select: { is_not_empty: true, property: this.property } };
     }
 }

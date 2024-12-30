@@ -1,23 +1,24 @@
 export class RollupField {
-    private readonly property: string;
+    constructor(readonly property: string) {
+    }
 
-    any(value: RollupSubfilterPropertyFilter): any {
+    any(value: RollupSubfilterPropertyFilter) {
         return { rollup: { any: value, property: this.property } };
     }
 
-    none(value: RollupSubfilterPropertyFilter): any {
+    none(value: RollupSubfilterPropertyFilter) {
         return { rollup: { none: value, property: this.property } };
     }
 
-    every(value: RollupSubfilterPropertyFilter): any {
+    every(value: RollupSubfilterPropertyFilter) {
         return { rollup: { every: value, property: this.property } };
     }
 
-    date(value: DatePropertyFilter): any {
+    date(value: DatePropertyFilter) {
         return { rollup: { date: value, property: this.property } };
     }
 
-    number(value: NumberPropertyFilter): any {
+    number(value: NumberPropertyFilter) {
         return { rollup: { number: value, property: this.property } };
     }
 }

@@ -1,11 +1,12 @@
 export class CheckboxField {
-    private readonly property: string;
+    constructor(readonly property: string) {
+    }
 
-    equals(value: boolean): any {
+    equals(value: boolean) {
         return { checkbox: { equals: value, property: this.property } };
     }
 
-    doesNotEqual(value: boolean): any {
+    doesNotEqual(value: boolean) {
         return { checkbox: { does_not_equal: value, property: this.property } };
     }
 }

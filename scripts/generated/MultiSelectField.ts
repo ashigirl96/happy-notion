@@ -1,19 +1,20 @@
 export class MultiSelectField {
-    private readonly property: string;
+    constructor(readonly property: string) {
+    }
 
-    contains(value: string): any {
+    contains(value: string) {
         return { multi_select: { contains: value, property: this.property } };
     }
 
-    doesNotContain(value: string): any {
+    doesNotContain(value: string) {
         return { multi_select: { does_not_contain: value, property: this.property } };
     }
 
-    isEmpty(): any {
+    isEmpty() {
         return { multi_select: { is_empty: true, property: this.property } };
     }
 
-    isNotEmpty(): any {
+    isNotEmpty() {
         return { multi_select: { is_not_empty: true, property: this.property } };
     }
 }

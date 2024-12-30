@@ -1,59 +1,60 @@
 export class DateField {
-    private readonly property: string;
+    constructor(readonly property: string) {
+    }
 
-    equals(value: string): any {
+    equals(value: string) {
         return { date: { equals: value, property: this.property } };
     }
 
-    before(value: string): any {
+    before(value: string) {
         return { date: { before: value, property: this.property } };
     }
 
-    after(value: string): any {
+    after(value: string) {
         return { date: { after: value, property: this.property } };
     }
 
-    on_or_before(value: string): any {
+    onOrBefore(value: string) {
         return { date: { on_or_before: value, property: this.property } };
     }
 
-    on_or_after(value: string): any {
+    onOrAfter(value: string) {
         return { date: { on_or_after: value, property: this.property } };
     }
 
-    this_week(value: EmptyObject): any {
+    thisWeek(value: EmptyObject) {
         return { date: { this_week: value, property: this.property } };
     }
 
-    past_week(value: EmptyObject): any {
+    pastWeek(value: EmptyObject) {
         return { date: { past_week: value, property: this.property } };
     }
 
-    past_month(value: EmptyObject): any {
+    pastMonth(value: EmptyObject) {
         return { date: { past_month: value, property: this.property } };
     }
 
-    past_year(value: EmptyObject): any {
+    pastYear(value: EmptyObject) {
         return { date: { past_year: value, property: this.property } };
     }
 
-    next_week(value: EmptyObject): any {
+    nextWeek(value: EmptyObject) {
         return { date: { next_week: value, property: this.property } };
     }
 
-    next_month(value: EmptyObject): any {
+    nextMonth(value: EmptyObject) {
         return { date: { next_month: value, property: this.property } };
     }
 
-    next_year(value: EmptyObject): any {
+    nextYear(value: EmptyObject) {
         return { date: { next_year: value, property: this.property } };
     }
 
-    isEmpty(): any {
+    isEmpty() {
         return { date: { is_empty: true, property: this.property } };
     }
 
-    isNotEmpty(): any {
+    isNotEmpty() {
         return { date: { is_not_empty: true, property: this.property } };
     }
 }

@@ -1,36 +1,36 @@
 export class RichTextField {
-    constructor(private readonly property: string) {}
+    constructor(readonly property: string) {
+    }
 
-    equals(value: string): any {
+    equals(value: string) {
         return { rich_text: { equals: value, property: this.property } };
     }
 
-    doesNotEqual(value: string): any {
+    doesNotEqual(value: string) {
         return { rich_text: { does_not_equal: value, property: this.property } };
     }
 
-    contains(value: string): any {
+    contains(value: string) {
         return { rich_text: { contains: value, property: this.property } };
     }
 
-    doesNotContain(value: string): any {
+    doesNotContain(value: string) {
         return { rich_text: { does_not_contain: value, property: this.property } };
     }
 
-    startsWith(value: string): any {
+    startsWith(value: string) {
         return { rich_text: { starts_with: value, property: this.property } };
     }
 
-    endsWith(value: string): any {
+    endsWith(value: string) {
         return { rich_text: { ends_with: value, property: this.property } };
     }
 
-    isEmpty(): any {
+    isEmpty() {
         return { rich_text: { is_empty: true, property: this.property } };
     }
 
-    isNotEmpty(): any {
+    isNotEmpty() {
         return { rich_text: { is_not_empty: true, property: this.property } };
     }
 }
-

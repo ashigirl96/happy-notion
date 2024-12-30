@@ -1,11 +1,12 @@
 export class FilesField {
-    private readonly property: string;
+    constructor(readonly property: string) {
+    }
 
-    isEmpty(): any {
+    isEmpty() {
         return { files: { is_empty: true, property: this.property } };
     }
 
-    isNotEmpty(): any {
+    isNotEmpty() {
         return { files: { is_not_empty: true, property: this.property } };
     }
 }

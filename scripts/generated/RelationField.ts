@@ -1,19 +1,20 @@
 export class RelationField {
-    private readonly property: string;
+    constructor(readonly property: string) {
+    }
 
-    contains(value: string): any {
+    contains(value: string) {
         return { relation: { contains: value, property: this.property } };
     }
 
-    doesNotContain(value: string): any {
+    doesNotContain(value: string) {
         return { relation: { does_not_contain: value, property: this.property } };
     }
 
-    isEmpty(): any {
+    isEmpty() {
         return { relation: { is_empty: true, property: this.property } };
     }
 
-    isNotEmpty(): any {
+    isNotEmpty() {
         return { relation: { is_not_empty: true, property: this.property } };
     }
 }

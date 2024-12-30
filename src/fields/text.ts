@@ -56,7 +56,7 @@ export type TextFieldIsNotEmpty = {
 
 type Fill = string
 
-export class TextField extends BaseField<'title', Fill> {
+export class TextField extends BaseField<'title'> {
   constructor(readonly content: string) {
     super()
   }

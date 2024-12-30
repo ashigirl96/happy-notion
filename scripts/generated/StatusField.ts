@@ -1,19 +1,20 @@
 export class StatusField {
-    private readonly property: string;
+    constructor(readonly property: string) {
+    }
 
-    equals(value: string): any {
+    equals(value: string) {
         return { status: { equals: value, property: this.property } };
     }
 
-    doesNotEqual(value: string): any {
+    doesNotEqual(value: string) {
         return { status: { does_not_equal: value, property: this.property } };
     }
 
-    isEmpty(): any {
+    isEmpty() {
         return { status: { is_empty: true, property: this.property } };
     }
 
-    isNotEmpty(): any {
+    isNotEmpty() {
         return { status: { is_not_empty: true, property: this.property } };
     }
 }

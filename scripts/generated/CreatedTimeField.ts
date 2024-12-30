@@ -1,59 +1,60 @@
 export class CreatedTimeField {
-    private readonly property: string;
+    constructor(readonly property: string) {
+    }
 
-    equals(value: string): any {
+    equals(value: string) {
         return { created_time: { equals: value, property: this.property } };
     }
 
-    before(value: string): any {
+    before(value: string) {
         return { created_time: { before: value, property: this.property } };
     }
 
-    after(value: string): any {
+    after(value: string) {
         return { created_time: { after: value, property: this.property } };
     }
 
-    on_or_before(value: string): any {
+    onOrBefore(value: string) {
         return { created_time: { on_or_before: value, property: this.property } };
     }
 
-    on_or_after(value: string): any {
+    onOrAfter(value: string) {
         return { created_time: { on_or_after: value, property: this.property } };
     }
 
-    this_week(value: EmptyObject): any {
+    thisWeek(value: EmptyObject) {
         return { created_time: { this_week: value, property: this.property } };
     }
 
-    past_week(value: EmptyObject): any {
+    pastWeek(value: EmptyObject) {
         return { created_time: { past_week: value, property: this.property } };
     }
 
-    past_month(value: EmptyObject): any {
+    pastMonth(value: EmptyObject) {
         return { created_time: { past_month: value, property: this.property } };
     }
 
-    past_year(value: EmptyObject): any {
+    pastYear(value: EmptyObject) {
         return { created_time: { past_year: value, property: this.property } };
     }
 
-    next_week(value: EmptyObject): any {
+    nextWeek(value: EmptyObject) {
         return { created_time: { next_week: value, property: this.property } };
     }
 
-    next_month(value: EmptyObject): any {
+    nextMonth(value: EmptyObject) {
         return { created_time: { next_month: value, property: this.property } };
     }
 
-    next_year(value: EmptyObject): any {
+    nextYear(value: EmptyObject) {
         return { created_time: { next_year: value, property: this.property } };
     }
 
-    isEmpty(): any {
+    isEmpty() {
         return { created_time: { is_empty: true, property: this.property } };
     }
 
-    isNotEmpty(): any {
+    isNotEmpty() {
         return { created_time: { is_not_empty: true, property: this.property } };
     }
 }

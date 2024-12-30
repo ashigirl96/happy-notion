@@ -14,8 +14,8 @@ type Value<T> = CreatePageParameters['properties'] extends Record<string, infer 
     : never
   : never
 
-export abstract class BaseField<K extends Kind, TValue> {
+export abstract class BaseField<K extends Kind> {
   protected constructor() {}
 
-  abstract fill(value: TValue): Value<K>
+  abstract fill(value: unknown): Value<K>
 }

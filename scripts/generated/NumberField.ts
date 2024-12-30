@@ -1,35 +1,36 @@
 export class NumberField {
-    private readonly property: string;
+    constructor(readonly property: string) {
+    }
 
-    equals(value: number): any {
+    equals(value: number) {
         return { number: { equals: value, property: this.property } };
     }
 
-    doesNotEqual(value: number): any {
+    doesNotEqual(value: number) {
         return { number: { does_not_equal: value, property: this.property } };
     }
 
-    greater_than(value: number): any {
+    greaterThan(value: number) {
         return { number: { greater_than: value, property: this.property } };
     }
 
-    less_than(value: number): any {
+    lessThan(value: number) {
         return { number: { less_than: value, property: this.property } };
     }
 
-    greater_than_or_equal_to(value: number): any {
+    greaterThanOrEqualTo(value: number) {
         return { number: { greater_than_or_equal_to: value, property: this.property } };
     }
 
-    less_than_or_equal_to(value: number): any {
+    lessThanOrEqualTo(value: number) {
         return { number: { less_than_or_equal_to: value, property: this.property } };
     }
 
-    isEmpty(): any {
+    isEmpty() {
         return { number: { is_empty: true, property: this.property } };
     }
 
-    isNotEmpty(): any {
+    isNotEmpty() {
         return { number: { is_not_empty: true, property: this.property } };
     }
 }
