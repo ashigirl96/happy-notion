@@ -1,37 +1,16 @@
-export type SelectFieldProperty = {
-  select: {
-    name: string
-  }
-}
-export type SelectFieldEquals = {
-  property: string
-  select: {
-    equals: string
-  }
-}
-export type SelectFieldDoesNotEqual = {
-  property: string
-  select: {
-    does_not_equal: string
-  }
-}
-export type SelectFieldIsEmpty = {
-  property: string
-  select: {
-    is_empty: true
-  }
-}
-export type SelectFieldIsNotEmpty = {
-  property: string
-  select: {
-    is_not_empty: true
-  }
-}
+import { BaseField, type FillValue } from '@/fields/base'
 
-export class SelectField {
-  constructor(readonly name: string) {}
+export type SelectFieldEquals = { property: string; select: { equals: string } }
+export type SelectFieldDoesNotEqual = { property: string; select: { does_not_equal: string } }
+export type SelectFieldIsEmpty = { property: string; select: { is_empty: true } }
+export type SelectFieldIsNotEmpty = { property: string; select: { is_not_empty: true } }
 
-  property(value: string): SelectFieldProperty {
+export class SelectField extends BaseField<'select'> {
+  constructor(readonly property: string) {
+    super()
+  }
+
+  fill(value: string): FillValue<'select'> {
     return {
       select: {
         name: value,
@@ -40,39 +19,19 @@ export class SelectField {
   }
 
   equals(value: string): SelectFieldEquals {
-    return {
-      property: this.name,
-      select: {
-        equals: value,
-      },
-    }
+    return { property: this.property, select: { equals: value } }
   }
 
   doesNotEqual(value: string): SelectFieldDoesNotEqual {
-    return {
-      property: this.name,
-      select: {
-        does_not_equal: value,
-      },
-    }
+    return { property: this.property, select: { does_not_equal: value } }
   }
 
   isEmpty(): SelectFieldIsEmpty {
-    return {
-      property: this.name,
-      select: {
-        is_empty: true,
-      },
-    }
+    return { property: this.property, select: { is_empty: true } }
   }
 
   isNotEmpty(): SelectFieldIsNotEmpty {
-    return {
-      property: this.name,
-      select: {
-        is_not_empty: true,
-      },
-    }
+    return { property: this.property, select: { is_not_empty: true } }
   }
 }
 
