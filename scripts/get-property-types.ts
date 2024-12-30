@@ -4,8 +4,7 @@ import * as path from 'node:path'
 import { Project, type Type } from 'ts-morph'
 
 // プロジェクトの初期化
-const project = new Project({
-})
+const project = new Project({})
 
 // 解析対象のファイルパス
 const inputFilePath = path.resolve(
@@ -80,6 +79,6 @@ for (const unionType of propertyFilterType.getUnionTypes()) {
 function toPascalCase(str: string): string {
   return str
     .split('_')
-    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-    .join('');
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join('')
 }

@@ -1,40 +1,50 @@
-import { BaseField } from "@/fields/base";
+import { BaseField, type FillValue } from '@/fields/base'
 
-export type EmailFieldEquals = { property: string; email: { equals: string } };
-export type EmailFieldDoesNotEqual = { property: string; email: { does_not_equal: string } };
-export type EmailFieldContains = { property: string; email: { contains: string } };
-export type EmailFieldDoesNotContain = { property: string; email: { does_not_contain: string } };
-export type EmailFieldStartsWith = { property: string; email: { starts_with: string } };
-export type EmailFieldEndsWith = { property: string; email: { ends_with: string } };
+export type EmailFieldEquals = { property: string; email: { equals: string } }
+export type EmailFieldDoesNotEqual = { property: string; email: { does_not_equal: string } }
+export type EmailFieldContains = { property: string; email: { contains: string } }
+export type EmailFieldDoesNotContain = { property: string; email: { does_not_contain: string } }
+export type EmailFieldStartsWith = { property: string; email: { starts_with: string } }
+export type EmailFieldEndsWith = { property: string; email: { ends_with: string } }
 
-export class EmailField extends BaseField<"email"> {
-    constructor(readonly property: string) {
-        super()
-    }
+export class EmailField extends BaseField<'email'> {
+  constructor(readonly property: string) {
+    super()
+  }
 
-    equals(value: string): EmailFieldEquals {
-        return { property: this.property, email: { equals: value } };
-    }
+  fill(value: unknown): FillValue<'email'> {
+    return { email: value }
+  }
 
-    doesNotEqual(value: string): EmailFieldDoesNotEqual {
-        return { property: this.property, email: { does_not_equal: value } };
-    }
+  equals(value: string): EmailFieldEquals {
+    return { property: this.property, email: { equals: value } }
+  }
 
-    contains(value: string): EmailFieldContains {
-        return { property: this.property, email: { contains: value } };
-    }
+  doesNotEqual(value: string): EmailFieldDoesNotEqual {
+    return { property: this.property, email: { does_not_equal: value } }
+  }
 
-    doesNotContain(value: string): EmailFieldDoesNotContain {
-        return { property: this.property, email: { does_not_contain: value } };
-    }
+  contains(value: string): EmailFieldContains {
+    return { property: this.property, email: { contains: value } }
+  }
 
-    startsWith(value: string): EmailFieldStartsWith {
-        return { property: this.property, email: { starts_with: value } };
-    }
+  doesNotContain(value: string): EmailFieldDoesNotContain {
+    return { property: this.property, email: { does_not_contain: value } }
+  }
 
-    endsWith(value: string): EmailFieldEndsWith {
-        return { property: this.property, email: { ends_with: value } };
-    }
+  startsWith(value: string): EmailFieldStartsWith {
+    return { property: this.property, email: { starts_with: value } }
+  }
+
+  endsWith(value: string): EmailFieldEndsWith {
+    return { property: this.property, email: { ends_with: value } }
+  }
 }
 
-export type EmailFieldCondition = EmailFieldEquals | EmailFieldDoesNotEqual | EmailFieldContains | EmailFieldDoesNotContain | EmailFieldStartsWith | EmailFieldEndsWith;
+export type EmailFieldCondition =
+  | EmailFieldEquals
+  | EmailFieldDoesNotEqual
+  | EmailFieldContains
+  | EmailFieldDoesNotContain
+  | EmailFieldStartsWith
+  | EmailFieldEndsWith

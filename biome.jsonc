@@ -27,7 +27,8 @@
       },
       "correctness": {
         "noUnusedImports": "warn",
-        "noUnusedVariables": ["warn", { "prefixUnused": false }],
+        // "noUnusedVariables": ["warn", { "prefixUnused": false }],
+        "noUnusedLabels": "warn",
         "noNodejsModules": "off"
       },
       "suspicious": {

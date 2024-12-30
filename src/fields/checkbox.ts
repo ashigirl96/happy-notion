@@ -8,7 +8,7 @@ export class CheckboxField extends BaseField<'checkbox'> {
     super()
   }
 
-  fill(value: unknown): FillValue<'checkbox'> {
+  fill(value: boolean): FillValue<'checkbox'> {
     return { checkbox: value }
   }
 

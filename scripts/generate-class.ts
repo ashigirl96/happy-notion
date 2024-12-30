@@ -1,8 +1,8 @@
 #!/usr/bin/env bun
 
+import * as fs from 'node:fs'
 import * as path from 'node:path'
 import { Project, StructureKind, type Type } from 'ts-morph'
-import * as fs from 'fs'
 
 // プロジェクトの初期化
 const project = new Project({})
@@ -76,15 +76,21 @@ for (const unionType of propertyFilterType.getUnionTypes()) {
   const outputFile = project.createSourceFile(outputFilePath, '', { overwrite: true })
 
   // BaseFieldのインポートを追加
-  outputFile.addImportDeclaration({
-    namedImports: ['BaseField'],
-    moduleSpecifier: '@/fields/base',
-  })
+  // outputFile.addImportDeclaration({
+  //   namedImports: ['BaseField'],
+  //   moduleSpecifier: '@/fields/base',
+  // })
+  outputFile.addImportDeclarations([
+    {
+      namedImports: ['BaseField', 'type FillValue'],
+      moduleSpecifier: '@/fields/base',
+    },
+  ])
 
   // 型定義の追加
-  typeDefinitions.forEach(typeDef => {
+  for (const typeDef of typeDefinitions) {
     outputFile.addTypeAlias(typeDef)
-  })
+  }
 
   // クラスの生成
   outputFile.addClass({
@@ -113,7 +119,7 @@ for (const unionType of propertyFilterType.getUnionTypes()) {
     const conditionType = {
       name: conditionTypeName,
       isExported: true,
-      type: typeDefinitions.map(typeDef => typeDef.name).join(' | '),
+      type: typeDefinitions.map((typeDef) => typeDef.name).join(' | '),
     }
     outputFile.addTypeAlias(conditionType)
   }
@@ -126,7 +132,7 @@ for (const unionType of propertyFilterType.getUnionTypes()) {
 function toPascalCase(str: string): string {
   return str
     .split('_')
-    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
     .join('')
 }
 
@@ -139,6 +145,14 @@ function generateMethods(className: string, filterType: Type, filterName: string
   const methods: any[] = []
   const typeDefinitions: any[] = []
 
+  methods.push({
+    kind: StructureKind.Method,
+    name: 'fill',
+    returnType: `FillValue<'${filterName}'>`,
+    parameters: [{ name: 'value', type: 'unknown' }],
+    statements: `return { ${filterName}: value }`,
+  })
+
   for (const subType of filterType.getUnionTypes()) {
     if (!subType.isObject()) continue
 
@@ -150,22 +164,16 @@ function generateMethods(className: string, filterType: Type, filterName: string
     const declarations = prop.getDeclarations()
     if (declarations.length === 0) continue // 宣言が存在しない場合はスキップ
 
-// 宣言から型を取得
+    // 宣言から型を取得
     const propType = declarations[0].getType()
 
-    if (
-      !(
-        propType.isString() ||
-        propType.isNumber() ||
-        propType.isBoolean()
-      )
-    ) {
+    if (!(propType.isString() || propType.isNumber() || propType.isBoolean())) {
       // プリミティブ型でない場合、メソッドと型定義を生成しない
       continue
     }
 
     // メソッド名の決定（camelCaseに変換）
-    let methodName = toCamelCase(propName)
+    const methodName = toCamelCase(propName)
 
     // パラメータの有無
     const hasParam = propType.getText() !== 'true'
@@ -176,15 +184,15 @@ function generateMethods(className: string, filterType: Type, filterName: string
     // 戻り値の型定義
     const typeAlias = hasParam
       ? {
-        name: typeName,
-        isExported: true,
-        type: `{ property: string; ${filterName}: { ${propName}: ${propType.getText()} } }`,
-      }
+          name: typeName,
+          isExported: true,
+          type: `{ property: string; ${filterName}: { ${propName}: ${propType.getText()} } }`,
+        }
       : {
-        name: typeName,
-        isExported: true,
-        type: `{ property: string; ${filterName}: { ${propName}: true } }`,
-      }
+          name: typeName,
+          isExported: true,
+          type: `{ property: string; ${filterName}: { ${propName}: true } }`,
+        }
 
     typeDefinitions.push(typeAlias)
 
@@ -201,9 +209,7 @@ function generateMethods(className: string, filterType: Type, filterName: string
       kind: StructureKind.Method,
       name: methodName,
       returnType: returnType,
-      parameters: hasParam
-        ? [{ name: 'value', type: propType.getText() }]
-        : [],
+      parameters: hasParam ? [{ name: 'value', type: propType.getText() }] : [],
       statements: returnStatement,
     }
 
