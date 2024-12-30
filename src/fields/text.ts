@@ -1,9 +1,9 @@
+import { BaseField } from '@/fields/base'
+import { richText } from '@/fields/notion-sdk-js-helper/richTextObject'
+import type { TextRichTextItemResponse } from '@notionhq/client/build/src/api-endpoints'
+
 export type TextFieldProperty = {
-  title: {
-    text: {
-      content: string
-    }
-  }[]
+  title: TextRichTextItemResponse[]
 }
 export type TextFieldEquals = {
   property: string
@@ -54,18 +54,16 @@ export type TextFieldIsNotEmpty = {
   }
 }
 
-export class TextField {
-  constructor(readonly content: string) {}
+type Fill = Parameters<typeof richText>[0]
 
-  property(value: string): TextFieldProperty {
+export class TextField extends BaseField<TextFieldProperty, Fill> {
+  constructor(readonly content: string) {
+    super(content)
+  }
+
+  fill(value: Fill): TextFieldProperty {
     return {
-      title: [
-        {
-          text: {
-            content: value,
-          },
-        },
-      ],
+      title: [richText(value)],
     }
   }
 
