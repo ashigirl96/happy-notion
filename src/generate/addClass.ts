@@ -1,6 +1,6 @@
-import { kebabToCamel } from '@/generate/kebabToCamel'
 // クラス定義の関数
 import type { SourceFile } from 'ts-morph'
+import { AbstractDatabase } from '../core'
 
 export function addClass(
   sourceFile: SourceFile,
@@ -22,7 +22,7 @@ export function addClass(
         isPublic: true,
       },
       ...fields.map((field) => {
-        const name = kebabToCamel(field.name)
+        const name = AbstractDatabase.mapPropertyName(field.name)
         return {
           name,
           initializer: `new n.${field.type}('${name}')`,

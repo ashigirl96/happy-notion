@@ -1,5 +1,6 @@
 import { toNotionURL } from '@/core/utils'
 import type { FindCriteria, SaveCriteria } from '@/fields'
+import { kebabToCamel } from '@/generate/kebabToCamel'
 import type { Client } from '@notionhq/client'
 import type { QueryDatabaseResponse } from '@notionhq/client/build/src/api-endpoints'
 import { ResultAsync, err, ok } from 'neverthrow'
@@ -129,5 +130,9 @@ export abstract class AbstractDatabase<T> {
       })(),
       (e) => (e instanceof Error ? e : new Error(String(e))),
     )
+  }
+
+  static mapPropertyName(name: string): string {
+    return kebabToCamel(name)
   }
 }
