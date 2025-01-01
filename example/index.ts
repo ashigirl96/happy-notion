@@ -24,12 +24,14 @@ async function create() {
 
 async function findBy() {
   const response = await databases.Tasks.findBy({
-    where: databases.Tasks.Name.contains('test1'),
+    where: {
+      and: [databases.Tasks.Name.contains('test1'), databases.Tasks.Number.equals(10)],
+    },
   })
   if (response.isOk()) {
-    console.log(response.value)
+    console.dir(response.value, { depth: null })
   }
 }
 
-void create()
-// void findBy()
+// void create()
+void findBy()

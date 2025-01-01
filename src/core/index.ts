@@ -15,7 +15,7 @@ export abstract class AbstractDatabase<T> {
   /**
    * 指定条件に合致する Notion ページを取得する
    */
-  findBy(criteria: FindCriteria<T>): ResultAsync<Page[], Error> {
+  findPagesBy(criteria: FindCriteria<T>): ResultAsync<Page[], Error> {
     return ResultAsync.fromPromise(
       (async () => {
         const response = await this.client.databases.query({
@@ -23,6 +23,36 @@ export abstract class AbstractDatabase<T> {
           filter: criteria.where,
         })
         return response.results
+      })(),
+      (e) => (e instanceof Error ? e : new Error(String(e))),
+    )
+  }
+
+  _findPagesBy(criteria: FindCriteria<T>): ResultAsync<Page[], Error> {
+    return ResultAsync.fromPromise(
+      (async () => {
+        const response = await this.client.databases.query({
+          database_id: this.id,
+          filter: criteria.where,
+        })
+        return response.results.map((result) => {
+          if (result.object !== 'page' || !('properties' in result)) {
+            return null
+          }
+          const properties: Record<string, unknown> = {}
+          for (const [key, value] of Object.entries(result.properties)) {
+            // クラスのプロパティに存在しないプロパティは無視する
+            const _key = AbstractDatabase.mapPropertyName(key)
+            if (!(_key in this)) {
+              continue
+            }
+            properties[_key] = this[_key].map(value)
+          }
+          return {
+            ...result,
+            properties,
+          }
+        })
       })(),
       (e) => (e instanceof Error ? e : new Error(String(e))),
     )
@@ -59,7 +89,7 @@ export abstract class AbstractDatabase<T> {
     }
 
     // where がある場合
-    return this.findBy(criteria.where).andThen((pages) => {
+    return this.findPagesBy(criteria.where).andThen((pages) => {
       if (pages.length === 0) {
         return ok({ kind: 'create' } as const)
       }
