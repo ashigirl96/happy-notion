@@ -68,20 +68,14 @@ const mockCondition = {
   },
 }
 
+const mockResult = {
+  object: 'page',
+  properties: {
+    x: 1,
+  },
+}
+
 describe('AbstractDatabase', () => {
-  it('findBy: no results', async () => {
-    const mockClient = createMockClient({})
-    const db = new TestDatabase(mockClient as any)
-
-    const result = await db.findPagesBy({ where: mockCondition }).match(
-      (okValue) => okValue,
-      (errValue) => {
-        throw errValue
-      },
-    )
-    expect(result).toEqual([])
-  })
-
   it('savePage: create (no existing page)', async () => {
     const mockClient = createMockClient({})
     const db = new TestDatabase(mockClient as any)
@@ -103,7 +97,7 @@ describe('AbstractDatabase', () => {
   it('savePage: update (single existing page)', async () => {
     // queryで1件返す mockClient
     const mockClient = createMockClient({
-      queryFn: () => Promise.resolve({ results: [{ id: 'existing-page-id' }] }),
+      queryFn: () => Promise.resolve({ results: [{ id: 'existing-page-id', ...mockResult }] }),
     })
     const db = new TestDatabase(mockClient as any)
 
@@ -127,7 +121,13 @@ describe('AbstractDatabase', () => {
   it('savePage: error (multiple pages)', async () => {
     // queryで2件返す mockClient
     const mockClient = createMockClient({
-      queryFn: () => Promise.resolve({ results: [{ id: 'page1' }, { id: 'page2' }] }),
+      queryFn: () =>
+        Promise.resolve({
+          results: [
+            { id: 'page1', ...mockResult },
+            { id: 'page2', ...mockResult },
+          ],
+        }),
     })
     const db = new TestDatabase(mockClient as any)
 
@@ -139,7 +139,7 @@ describe('AbstractDatabase', () => {
       })
       .match(
         (_okValue) => {
-          throw new Error('Should not return ok')
+          throw new Error(`Should not return ok ${JSON.stringify(_okValue, null, 2)}`)
         },
         (errValue) => {
           expect(errValue.message).toBe('Multiple pages found')
@@ -147,20 +147,44 @@ describe('AbstractDatabase', () => {
       )
   })
 
-  it('_findPagesBy', async () => {
-    const mockClient = createMockClient({
-      queryFn: () => Promise.resolve(mockResponse),
-    })
+  it('findBy: no results', async () => {
+    const mockClient = createMockClient({})
     const db = new TestDatabase(mockClient as any)
 
-    const result = await db._findPagesBy({ where: mockCondition }).match(
+    const result = await db.findPagesBy({ where: mockCondition }).match(
       (okValue) => okValue,
       (errValue) => {
         throw errValue
       },
     )
+    expect(result).toEqual([])
+  })
 
-    console.log(result)
+  it('findPagesBy works', async () => {
+    const mockClient = createMockClient({
+      queryFn: () => Promise.resolve(mockResponse),
+    })
+    const db = new TestDatabase(mockClient as any)
+
+    const results = await db.findPagesBy({ where: mockCondition }).match(
+      (okValue) => okValue,
+      (errValue) => {
+        throw errValue
+      },
+    )
+    const properties = results[0].properties
+
+    expect(properties.Checkbox).toEqual(true)
+    expect(properties.URL).toEqual('https://example.com')
+    expect(properties.Relation).toEqual(['16c34b35-bfa4-8167-b767-e3b946e7a7ab'])
+    expect(properties.Select).toEqual('test10')
+    expect(properties.Assigned).toEqual('d7176521-3a9a-43d2-b9ed-56cc16cc85b0')
+    expect(properties.Status).toEqual('In progress')
+    expect(properties.MultiSelect).toEqual(['test1', 'test2', 'test3'])
+    expect(properties.Text).toEqual('test3test4test5')
+    expect(properties.Number).toEqual(10)
+    expect(properties.Date.toISOString()).toEqual('2024-12-31T15:00:00.000Z')
+    expect(properties.Name).toEqual('test1')
   })
 })
 

@@ -1,13 +1,14 @@
-import type { DatabaseProperties } from '@/core/types'
+import type { DatabaseProperties, DatabaseProperty } from '@/core/types'
 import { toNotionURL } from '@/core/utils'
 import type { FindCriteria, SaveCriteria } from '@/fields'
+import { BaseField } from '@/fields/base'
 import { kebabToCamel } from '@/generate/kebabToCamel'
 import type { Client } from '@notionhq/client'
 import type { QueryDatabaseResponse } from '@notionhq/client/build/src/api-endpoints'
 import { ResultAsync, err, ok } from 'neverthrow'
 
-type PageResult = Extract<QueryDatabaseResponse['results'][0], { object: 'page'; properties: any }>
-type EasyPageResult<T extends AbstractDatabase<T>> = PageResult & {
+type RawPage = Extract<QueryDatabaseResponse['results'][0], { object: 'page'; properties: any }>
+type Page<T extends AbstractDatabase<T>> = RawPage & {
   properties: DatabaseProperties<T>
 }
 
@@ -16,50 +17,35 @@ export abstract class AbstractDatabase<T extends AbstractDatabase<any>> {
 
   protected constructor(protected client: Client) {}
 
-  private isPage(result: QueryDatabaseResponse['results'][0]): result is PageResult {
-    return result.object === 'page' && 'properties' in result
+  private isProperty(key: string): key is DatabaseProperty<T> {
+    return key in this && this[key] instanceof BaseField
   }
 
   /**
    * 指定条件に合致する Notion ページを取得する
    */
-  findPagesBy(criteria: FindCriteria<T>): ResultAsync<PageResult[], Error> {
+  findPagesBy(criteria: FindCriteria<T>): ResultAsync<Page<T>[], Error> {
     return ResultAsync.fromPromise(
       (async () => {
         const response = await this.client.databases.query({
           database_id: this.id,
           filter: criteria.where,
         })
-        return response.results.filter((r) => this.isPage(r))
-      })(),
-      (e) => (e instanceof Error ? e : new Error(String(e))),
-    )
-  }
-
-  _findPagesBy(criteria: FindCriteria<T>): ResultAsync<EasyPageResult<T>[], Error> {
-    return ResultAsync.fromPromise(
-      (async () => {
-        const response = await this.client.databases.query({
-          database_id: this.id,
-          filter: criteria.where,
-        })
-        return response.results.map((result) => {
-          if (result.object !== 'page' || !('properties' in result)) {
-            return null
-          }
-          const properties: Record<string, unknown> = {}
-          for (const [key, value] of Object.entries(result.properties)) {
-            // クラスのプロパティに存在しないプロパティは無視する
-            const _key = AbstractDatabase.mapPropertyName(key)
-            if (!(_key in this)) {
-              continue
-            }
-            properties[_key] = this[_key].map(value)
-          }
+        const results = response.results.filter((r) => isPage(r))
+        return results.map((result) => {
+          const keys = Object.keys(result.properties)
+            .map((v) => AbstractDatabase.mapPropertyName(v))
+            .filter((v) => this.isProperty(v))
+          const properties = keys.reduce((acc, key) => {
+            const field = this[key] as BaseField<any>
+            // @ts-expect-error
+            acc[key] = field.map(result.properties[key])
+            return acc
+          }, {})
           return {
             ...result,
             properties,
-          }
+          } as Page<T>
         })
       })(),
       (e) => (e instanceof Error ? e : new Error(String(e))),
@@ -90,7 +76,7 @@ export abstract class AbstractDatabase<T extends AbstractDatabase<any>> {
    */
   private existsPage(
     criteria: SaveCriteria<T>,
-  ): ResultAsync<{ kind: 'create' } | { kind: 'update'; page: PageResult }, Error> {
+  ): ResultAsync<{ kind: 'create' } | { kind: 'update'; page: RawPage }, Error> {
     // where がない場合
     if (!criteria.where) {
       return ResultAsync.fromSafePromise(Promise.resolve({ kind: 'create' }))
@@ -173,4 +159,8 @@ export abstract class AbstractDatabase<T extends AbstractDatabase<any>> {
   static mapPropertyName(name: string): string {
     return kebabToCamel(name)
   }
+}
+
+function isPage(result: QueryDatabaseResponse['results'][0]): result is RawPage {
+  return result.object === 'page' && 'properties' in result
 }

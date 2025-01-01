@@ -1,4 +1,4 @@
-import type { AbstractDatabaseProperty } from '@/core/types'
+import type { AbstractDatabase } from '@/core'
 import type { FillValue } from '@/fields/base'
 import { CheckboxField, type CheckboxFieldCondition } from '@/fields/checkbox'
 import { DateField, type DateFieldCondition } from '@/fields/date'
@@ -27,6 +27,10 @@ export { RelationField } from './relation'
 export { RichTextField } from './rich-text'
 export { UrlField } from './url'
 export { MultiSelectField } from './multi-select'
+
+export type FindOptions = {
+  isRaw?: boolean
+}
 
 export type FindCriteria<T> = {
   where:
@@ -97,28 +101,15 @@ type PropertiesType<T, ExcludedKeys> = {
   [K in keyof T as K extends ExcludedKeys ? never : K]?: FillValueForField<T[K]>
 }
 
-type ExcludedKeys<T> = AbstractDatabaseProperty<T>
+type ExcludedKeys<T extends AbstractDatabase<any>> = keyof AbstractDatabase<T>
 export type BlockObjectRequest = Exclude<CreatePageParameters['children'], undefined>[0]
-export type SaveCriteria<T> = {
+export type SaveCriteria<T extends AbstractDatabase<any>> = {
   options?: {
     isAppendChildren: (client: Client) => Promise<boolean>
   }
   where?: FindCriteria<T>
   emoji?: Extract<CreatePageParameters['icon'], { type?: 'emoji' }>['emoji']
   children?: BlockObjectRequest[]
-  // properties: {
-  //   [K in keyof T as K extends ExcludedKeys ? never : K]?: T[K] extends TextField
-  //     ? TextFieldProperty
-  //     : T[K] extends RichTextField
-  //       ? RichTextFieldProperty
-  //       : T[K] extends SelectField
-  //         ? SelectFieldProperty
-  //         : T[K] extends UrlField
-  //           ? UrlFieldProperty
-  //           : T[K] extends MultiSelectField
-  //             ? MultiSelectFieldProperty
-  //             : never
-  // }
   properties: PropertiesType<T, ExcludedKeys<T>>
 }
 
