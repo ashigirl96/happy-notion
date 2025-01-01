@@ -1,3 +1,4 @@
+import type { DatabaseProperties } from '@/core/types'
 import { toNotionURL } from '@/core/utils'
 import type { FindCriteria, SaveCriteria } from '@/fields'
 import { kebabToCamel } from '@/generate/kebabToCamel'
@@ -5,30 +6,37 @@ import type { Client } from '@notionhq/client'
 import type { QueryDatabaseResponse } from '@notionhq/client/build/src/api-endpoints'
 import { ResultAsync, err, ok } from 'neverthrow'
 
-type Page = QueryDatabaseResponse['results'][0]
+type PageResult = Extract<QueryDatabaseResponse['results'][0], { object: 'page'; properties: any }>
+type EasyPageResult<T extends AbstractDatabase<T>> = PageResult & {
+  properties: DatabaseProperties<T>
+}
 
-export abstract class AbstractDatabase<T> {
+export abstract class AbstractDatabase<T extends AbstractDatabase<any>> {
   protected id!: string
 
   protected constructor(protected client: Client) {}
 
+  private isPage(result: QueryDatabaseResponse['results'][0]): result is PageResult {
+    return result.object === 'page' && 'properties' in result
+  }
+
   /**
    * 指定条件に合致する Notion ページを取得する
    */
-  findPagesBy(criteria: FindCriteria<T>): ResultAsync<Page[], Error> {
+  findPagesBy(criteria: FindCriteria<T>): ResultAsync<PageResult[], Error> {
     return ResultAsync.fromPromise(
       (async () => {
         const response = await this.client.databases.query({
           database_id: this.id,
           filter: criteria.where,
         })
-        return response.results
+        return response.results.filter((r) => this.isPage(r))
       })(),
       (e) => (e instanceof Error ? e : new Error(String(e))),
     )
   }
 
-  _findPagesBy(criteria: FindCriteria<T>): ResultAsync<Page[], Error> {
+  _findPagesBy(criteria: FindCriteria<T>): ResultAsync<EasyPageResult<T>[], Error> {
     return ResultAsync.fromPromise(
       (async () => {
         const response = await this.client.databases.query({
@@ -82,7 +90,7 @@ export abstract class AbstractDatabase<T> {
    */
   private existsPage(
     criteria: SaveCriteria<T>,
-  ): ResultAsync<{ kind: 'create' } | { kind: 'update'; page: Page }, Error> {
+  ): ResultAsync<{ kind: 'create' } | { kind: 'update'; page: PageResult }, Error> {
     // where がない場合
     if (!criteria.where) {
       return ResultAsync.fromSafePromise(Promise.resolve({ kind: 'create' }))

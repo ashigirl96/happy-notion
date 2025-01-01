@@ -21,6 +21,14 @@ export class TitleField extends BaseField<'title'> {
     }
   }
 
+  map(filled: FillValue<'title'>): string {
+    return filled.title
+      .map((v) => {
+        return v.type === 'text' ? v.text.content : ''
+      })
+      .join('')
+  }
+
   equals(value: string): TitleFieldEquals {
     return { property: this.property, title: { equals: value } }
   }

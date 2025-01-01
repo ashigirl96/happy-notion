@@ -18,6 +18,10 @@ export class StatusField extends BaseField<'status'> {
     }
   }
 
+  map(filled: FillValue<'status'>): string {
+    return filled.status.name
+  }
+
   equals(value: string): StatusFieldEquals {
     return { property: this.property, status: { equals: value } }
   }

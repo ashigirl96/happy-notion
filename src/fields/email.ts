@@ -18,6 +18,10 @@ export class EmailField extends BaseField<'email'> {
     return { email }
   }
 
+  map(filled: FillValue<'email'>): string {
+    return filled.email
+  }
+
   equals(value: string): EmailFieldEquals {
     return { property: this.property, email: { equals: value } }
   }

@@ -20,6 +20,10 @@ export class PeopleField extends BaseField<'people'> {
     }
   }
 
+  map(filled: FillValue<'people'>): string {
+    return filled.people[0].id
+  }
+
   contains(value: string): PeopleFieldContains {
     return { property: this.property, people: { contains: value } }
   }

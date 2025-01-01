@@ -17,6 +17,10 @@ export class RelationField extends BaseField<'relation'> {
     return { relation: [{ id }] }
   }
 
+  map(filled: FillValue<'relation'>): string[] {
+    return filled.relation.map((v) => v.id)
+  }
+
   contains(value: string): RelationFieldContains {
     return { property: this.property, relation: { contains: value } }
   }

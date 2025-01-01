@@ -12,6 +12,10 @@ export class CheckboxField extends BaseField<'checkbox'> {
     return { checkbox: value }
   }
 
+  map(filled: FillValue<'checkbox'>): boolean {
+    return filled.checkbox
+  }
+
   equals(value: boolean): CheckboxFieldEquals {
     return { property: this.property, checkbox: { equals: value } }
   }

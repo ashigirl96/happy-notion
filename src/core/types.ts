@@ -1,3 +1,4 @@
+import type { BaseField } from '@/fields/base'
 import type { AbstractDatabase } from './index'
 
 type AllInstanceKeys<T> = keyof T & keyof Required<T>
@@ -13,3 +14,9 @@ export type AbstractDatabaseProperty<T> =
   | 'createPage'
   | 'updatePage'
   | 'existsPage'
+
+type ExtractBaseFieldReturnType<T> = T extends BaseField<any> ? ReturnType<T['map']> : never
+
+export type DatabaseProperties<T extends AbstractDatabase<any>> = {
+  [P in keyof T as T[P] extends BaseField<any> ? P : never]: ExtractBaseFieldReturnType<T[P]>
+}

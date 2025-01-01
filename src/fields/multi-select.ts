@@ -21,6 +21,10 @@ export class MultiSelectField extends BaseField<'multi_select'> {
     }
   }
 
+  map(filled: FillValue<'multi_select'>): string[] {
+    return filled.multi_select.map((v) => v.name)
+  }
+
   contains(value: string): MultiSelectFieldContains {
     return { property: this.property, multi_select: { contains: value } }
   }

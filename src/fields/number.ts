@@ -24,6 +24,10 @@ export class NumberField extends BaseField<'number'> {
     return { number: value }
   }
 
+  map(filled: FillValue<'number'>): number | null {
+    return filled.number
+  }
+
   equals(value: number): NumberFieldEquals {
     return { property: this.property, number: { equals: value } }
   }

@@ -29,6 +29,14 @@ export class RichTextField extends BaseField<'rich_text'> {
     }
   }
 
+  map(filled: FillValue<'rich_text'>): string {
+    return filled.rich_text
+      .map((v) => {
+        return v.type === 'text' ? v.text.content : ''
+      })
+      .join('')
+  }
+
   equals(value: string): RichTextFieldEquals {
     return { property: this.property, rich_text: { equals: value } }
   }

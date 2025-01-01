@@ -20,6 +20,13 @@ export class DateField extends BaseField<'date'> {
     return { date: { ...value, time_zone: 'Asia/Tokyo' } }
   }
 
+  map(filled: FillValue<'date'>): Date | null {
+    if (filled.date?.start === null) {
+      return null
+    }
+    return new Date(filled.date.start)
+  }
+
   equals(value: string): DateFieldEquals {
     return { property: this.property, date: { equals: value } }
   }

@@ -18,6 +18,10 @@ export class SelectField extends BaseField<'select'> {
     }
   }
 
+  map(filled: FillValue<'select'>): string {
+    return filled.select.name
+  }
+
   equals(value: string): SelectFieldEquals {
     return { property: this.property, select: { equals: value } }
   }

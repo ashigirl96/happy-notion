@@ -18,6 +18,10 @@ export class UrlField extends BaseField<'url'> {
     return { url: value }
   }
 
+  map(filled: FillValue<'url'>): string | null {
+    return filled.url
+  }
+
   equals(value: string): UrlFieldEquals {
     return { property: this.property, url: { equals: value } }
   }
