@@ -19,7 +19,7 @@ describe('addClass Function', () => {
     // addClass 関数の呼び出し
     addClass(sourceFile, {
       className: 'TestClass',
-      envVar: 'TEST_ENV_VAR',
+      envVar: "process.env.TEST_ENV_VAR ?? ''",
       fields: [
         { name: 'name', type: 'TextField' },
         { name: 'age', type: 'NumberField' },
@@ -76,7 +76,7 @@ describe('addClass Function', () => {
       const docs = constructor.getJsDocs()
       expect(docs.length).toBe(1)
       expect(docs[0].getComment()).toBe(
-        '// biome-ignore lint/complexity/noUselessConstructor: <explanation>',
+        'biome-ignore lint/complexity/noUselessConstructor: <explanation>',
       )
     }
   })

@@ -83,7 +83,7 @@ export abstract class AbstractDatabase<T extends AbstractDatabase<any>> {
     }
 
     // where がある場合
-    return this.findPagesBy(criteria.where).andThen((pages) => {
+    return this.findPagesBy({ where: criteria.where }).andThen((pages) => {
       if (pages.length === 0) {
         return ok({ kind: 'create' } as const)
       }
