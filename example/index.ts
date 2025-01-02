@@ -23,11 +23,11 @@ async function create() {
 }
 
 async function findBy() {
-  const response = await databases.Tasks.findBy({
-    // where: {
-    //   // and: [databases.Tasks.Name.contains('test1'), databases.Tasks.Number.equals(10)],
-    // },
-    where: databases.Tasks.Name.contains('test3'),
+  const response = await databases.Tasks.findPagesBy({
+    where: databases.Tasks.Name.contains('test1'),
+  }).map((results) => {
+    const result = results[0]
+    return result.properties.MultiSelect
   })
   if (response.isOk()) {
     console.dir(response.value, { depth: null })
