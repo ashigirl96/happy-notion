@@ -28,10 +28,6 @@ export { RichTextField } from './rich-text'
 export { UrlField } from './url'
 export { MultiSelectField } from './multi-select'
 
-export type FindOptions = {
-  isRaw?: boolean
-}
-
 export type FindCriteria<T> = {
   where:
     | Condition<T[keyof T]>
@@ -63,6 +59,13 @@ export type Condition<T> = T extends CheckboxField
                       : T extends UrlField
                         ? UrlFieldCondition
                         : never
+
+export type Chainable<T> = {
+  where: FindCriteria<T>['where']
+  from: RelationField
+  middle: RelationField
+  to: RelationField
+}
 
 export const RawField = {
   checkbox: CheckboxField.name,

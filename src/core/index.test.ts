@@ -19,11 +19,13 @@ function createMockClient({
   createFn,
   appendFn,
   updateFn,
+  retrieveFn,
 }: {
   queryFn?: (args: any) => any
   createFn?: (args: any) => any
   updateFn?: (args: any) => any
   appendFn?: (args: any) => any
+  retrieveFn?: (args: any) => any
 }) {
   return {
     databases: {
@@ -32,6 +34,7 @@ function createMockClient({
     pages: {
       create: createFn || (() => Promise.resolve({ id: 'new-page-id' })),
       update: updateFn || (() => Promise.resolve({ id: 'updated-page-id' })),
+      retrieve: retrieveFn || (() => Promise.resolve({})), // デフォルトは空オブジェクト返却
     },
     blocks: {
       children: {
@@ -76,6 +79,139 @@ const mockResult = {
 }
 
 describe('AbstractDatabase', () => {
+  it('findPageById: success', async () => {
+    // retrieveが正常にpageを返すモック
+    const mockClient = createMockClient({
+      retrieveFn: () =>
+        Promise.resolve({
+          object: 'page',
+          id: 'page-id-123',
+          properties: {
+            Checkbox: {
+              type: 'checkbox',
+              checkbox: true,
+            },
+          },
+        }),
+    })
+    const db = new TestDatabase(mockClient as any)
+
+    const result = await db.findPageById('page-id-123').match(
+      (okValue) => okValue,
+      (errValue) => {
+        throw errValue
+      },
+    )
+    expect(result.id).toBe('page-id-123')
+    expect(result.properties.Checkbox).toBe(true)
+  })
+
+  it('findPageById: error (invalid response)', async () => {
+    // retrieveがpageオブジェクト以外を返すモック
+    const mockClient = createMockClient({
+      retrieveFn: () => Promise.resolve({ object: 'database' }),
+    })
+    const db = new TestDatabase(mockClient as any)
+
+    await db.findPageById('invalid-page-id').match(
+      (_okValue) => {
+        throw new Error(`Should not return ok ${JSON.stringify(_okValue, null, 2)}`)
+      },
+      (errValue) => {
+        expect(errValue.message).toBe('Invalid response')
+      },
+    )
+  })
+
+  it('should update pages via chain', async () => {
+    // A, Bから middle を辿って to に紐付ける想定のモックデータ
+    const mockPages = [
+      {
+        object: 'page',
+        id: 'pageA',
+        properties: {
+          // from.property が Relation なら ["middle-id-1"] のように想定
+          Relation: { relation: [{ id: 'middle-id-1' }] },
+        },
+      },
+      {
+        object: 'page',
+        id: 'pageB',
+        properties: {
+          Relation: { relation: [{ id: 'middle-id-2' }] },
+        },
+      },
+    ]
+    const middlePages: Record<string, any> = {
+      'middle-id-1': {
+        object: 'page',
+        id: 'middle-id-1',
+        properties: {
+          // middle.property も Relation として ["to-id-1"] を返すと仮定
+          Relation: { relation: [{ id: 'to-id-1' }] },
+        },
+      },
+      'middle-id-2': {
+        object: 'page',
+        id: 'middle-id-2',
+        properties: {
+          Relation: { relation: [{ id: 'to-id-2' }] },
+        },
+      },
+    }
+
+    // 手動モック: 呼ばれたときの引数を配列で保存しておき、後で検証する
+    const updateCalls: any[] = []
+    const updateFnMock = (args: any) => {
+      updateCalls.push(args)
+      return Promise.resolve({ id: args.page_id })
+    }
+
+    // モッククライアント生成
+    const mockClient = createMockClient({
+      queryFn: () => Promise.resolve({ results: mockPages }),
+      retrieveFn: (args) => Promise.resolve(middlePages[args.page_id]),
+      updateFn: updateFnMock,
+    })
+
+    // テスト用DBインスタンス
+    const db = new TestDatabase(mockClient as any)
+
+    // chainで使用するcriteria
+    const criteria = {
+      where: db.Name.contains('some-value'),
+      from: db.Relation, // Aから見た"中継先"のフィールド
+      middle: db.Relation, // "中継先"から最終的につなぐ先に関するフィールド
+      to: db.Relation, // Aに書き込む先のフィールド
+    }
+
+    // 実行
+    await db.chain(criteria).match(
+      (okValue) => okValue,
+      (errValue) => {
+        throw errValue
+      },
+    )
+
+    // 呼ばれた回数・引数をテスト
+    expect(updateCalls.length).toBe(2)
+
+    // 1回目
+    expect(updateCalls[0]).toEqual({
+      page_id: 'pageA',
+      properties: {
+        Relation: { relation: [{ id: 'to-id-1' }] },
+      },
+    })
+    // 2回目
+    expect(updateCalls[1]).toEqual({
+      page_id: 'pageB',
+      properties: {
+        Relation: { relation: [{ id: 'to-id-2' }] },
+      },
+    })
+  })
+
   it('savePage: create (no existing page)', async () => {
     const mockClient = createMockClient({})
     const db = new TestDatabase(mockClient as any)

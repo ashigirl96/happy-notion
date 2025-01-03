@@ -1,6 +1,6 @@
 import type { DatabaseProperties, DatabaseProperty } from '@/core/types'
 import { toNotionURL } from '@/core/utils'
-import type { FindCriteria, SaveCriteria } from '@/fields'
+import type { Chainable, FindCriteria, SaveCriteria } from '@/fields'
 import { BaseField } from '@/fields/base'
 import { kebabToCamel } from '@/generate/kebabToCamel'
 import type { Client } from '@notionhq/client'
@@ -22,7 +22,7 @@ export abstract class AbstractDatabase<T extends AbstractDatabase<any>> {
   }
 
   /**
-   * 指定条件に合致する Notion ページを取得する
+   * Notion ページをクエリして返す
    */
   findPagesBy(criteria: FindCriteria<T>): ResultAsync<Page<T>[], Error> {
     return ResultAsync.fromPromise(
@@ -36,12 +36,16 @@ export abstract class AbstractDatabase<T extends AbstractDatabase<any>> {
           const keys = Object.keys(result.properties)
             .map((v) => AbstractDatabase.mapPropertyName(v))
             .filter((v) => this.isProperty(v))
-          const properties = keys.reduce((acc, key) => {
-            const field = this[key] as BaseField<any>
-            // @ts-expect-error
-            acc[key] = field.map(result.properties[key])
-            return acc
-          }, {})
+
+          const properties = keys.reduce(
+            (acc, key) => {
+              const field = this[key] as BaseField<any>
+              acc[key] = field.map(result.properties[key])
+              return acc
+            },
+            {} as Record<string, unknown>,
+          )
+
           return {
             ...result,
             properties,
@@ -52,32 +56,73 @@ export abstract class AbstractDatabase<T extends AbstractDatabase<any>> {
     )
   }
 
-  // A<=>B、B<=>Cがあったとして、A<=>Cをつなげるためのメソッド
-  //   const inputResponse = await databases.input.findPagesBy({
-  //     where: {
-  //       and: [databases.input.category.isEmpty(), databases.input.outputs.isNotEmpty()],
-  //     },
-  //     x: databases.input.outputs,
-  //     middle: 'category',
-  //     y: databases.input.category,
-  //   })
-  chain(criteria: FindCriteria<T>): ResultAsync<void, Error> {
-    // return this.findPagesBy(criteria).andThen((pages) => {
-    //   if (pages.length === 0) {
-    //     return err(new Error('No pages found'))
-    //   }
-    //   if (pages.length > 1) {
-    //     return err(new Error('Multiple pages found'))
-    //   }
-    // }
-    return this.findPagesBy(criteria).andThen((pages) => {
-      for (const page of pages) {
-      }
+  /**
+   * 指定 ID のページを取得する
+   */
+  findPageById(id: string): ResultAsync<Page<T>, Error> {
+    return ResultAsync.fromPromise(
+      (async () => {
+        const response = await this.client.pages.retrieve({ page_id: id })
+        if (response.object !== 'page' || !('properties' in response)) {
+          throw new Error('Invalid response')
+        }
+        const keys = Object.keys(response.properties)
+          .map((v) => AbstractDatabase.mapPropertyName(v))
+          .filter((v) => this.isProperty(v))
+
+        const properties = keys.reduce(
+          (acc, key) => {
+            const field = this[key] as BaseField<any>
+            acc[key] = field.map(response.properties[key])
+            return acc
+          },
+          {} as Record<string, unknown>,
+        )
+
+        return {
+          ...response,
+          properties,
+        } as Page<T>
+      })(),
+      (e) => (e instanceof Error ? e : new Error(String(e))),
+    )
+  }
+
+  /**
+   * A<=>B、B<=>C というように紐付いているとき、
+   * A<=>C を自動的に紐付けられるようチェーンをつなぐメソッド
+   */
+  chain(criteria: Chainable<T>): ResultAsync<void, Error> {
+    // ここでは `chain` 自体を async にせず、
+    // 内部で async 関数を `ResultAsync.fromPromise` でラップする
+    return this.findPagesBy({ where: criteria.where }).andThen((pages) => {
+      return ResultAsync.fromPromise(
+        (async () => {
+          // 取得したページそれぞれに対して処理する
+          for (const page of pages) {
+            const middleId = last(page.properties[criteria.from.property] as unknown as string[])
+            // from => middle => to で辿りつくページの ID を取得
+            const toId = await this.findPageById(middleId).match(
+              (middlePage) =>
+                last(middlePage.properties[criteria.middle.property] as unknown as string[]),
+              () => '',
+            )
+            // toId を A の対象プロパティに更新
+            await this.client.pages.update({
+              page_id: page.id,
+              properties: {
+                [criteria.to.property]: criteria.to.fill(toId),
+              },
+            })
+          }
+        })(),
+        (e) => (e instanceof Error ? e : new Error(String(e))),
+      )
     })
   }
 
   /**
-   * ページを作成 or 更新して、そのURLを返す
+   * ページを新規作成 or 更新し、その URL を返す
    */
   savePage(criteria: SaveCriteria<T>): ResultAsync<{ url: string }, Error> {
     return this.existsPage(criteria).andThen((existsResult) => {
@@ -93,10 +138,10 @@ export abstract class AbstractDatabase<T extends AbstractDatabase<any>> {
   }
 
   /**
-   * where が指定されていない場合は新規作成扱い
-   * where から検索して 0 件 => create
-   * where から検索して 1 件 => update
-   * where から検索して 複数件 => err
+   * where が指定されていない場合 -> 新規作成
+   * where から検索して 0 件 -> create
+   * where から検索して 1 件 -> update
+   * where から検索して 複数件 -> エラー
    */
   private existsPage(
     criteria: SaveCriteria<T>,
@@ -114,7 +159,6 @@ export abstract class AbstractDatabase<T extends AbstractDatabase<any>> {
       if (pages.length === 1) {
         return ok({ kind: 'update', page: pages[0] } as const)
       }
-      // 2件以上あったらエラー
       return err(new Error('Multiple pages found'))
     })
   }
@@ -129,10 +173,12 @@ export abstract class AbstractDatabase<T extends AbstractDatabase<any>> {
           parent: {
             database_id: this.id,
           },
-          icon: criteria.emoji && {
-            type: 'emoji',
-            emoji: criteria.emoji,
-          },
+          icon: criteria.emoji
+            ? {
+                type: 'emoji',
+                emoji: criteria.emoji,
+              }
+            : undefined,
           children: criteria.children,
           properties: criteria.properties,
         })
@@ -156,25 +202,27 @@ export abstract class AbstractDatabase<T extends AbstractDatabase<any>> {
         const { options } = criteria
         const response = await this.client.pages.update({
           page_id: pageId,
-          icon: criteria.emoji && {
-            type: 'emoji',
-            emoji: criteria.emoji,
-          },
+          icon: criteria.emoji
+            ? {
+                type: 'emoji',
+                emoji: criteria.emoji,
+              }
+            : undefined,
           properties: criteria.properties,
         })
+
         // オプションで children を追加するかどうか
         if (options?.isAppendChildren) {
-          const isAppendChildren = await options.isAppendChildren(this.client, pageId)
-          if (isAppendChildren && criteria.children) {
+          const shouldAppendChildren = await options.isAppendChildren(this.client, pageId)
+          if (shouldAppendChildren && criteria.children) {
             await this.client.blocks.children.append({
               block_id: pageId,
               children: criteria.children,
             })
           }
         }
-        return {
-          url: toNotionURL(response.id),
-        }
+
+        return { url: toNotionURL(response.id) }
       })(),
       (e) => (e instanceof Error ? e : new Error(String(e))),
     )
@@ -187,4 +235,8 @@ export abstract class AbstractDatabase<T extends AbstractDatabase<any>> {
 
 function isPage(result: QueryDatabaseResponse['results'][0]): result is RawPage {
   return result.object === 'page' && 'properties' in result
+}
+
+function last<T>(arr: T[]): T {
+  return arr[arr.length - 1]
 }
