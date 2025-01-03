@@ -110,7 +110,7 @@ export type SaveCriteria<T extends AbstractDatabase<any>> = {
   options?: {
     isAppendChildren: (client: Client, pageId: string) => Promise<boolean>
   }
-  where: FindCriteria<T>['where']
+  where?: FindCriteria<T>['where']
   emoji?: Extract<CreatePageParameters['icon'], { type?: 'emoji' }>['emoji']
   children?: BlockObjectRequest[]
   properties: PropertiesType<T, ExcludedKeys<T>>
