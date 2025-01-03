@@ -2,6 +2,7 @@ import { databases } from './generated'
 
 async function create() {
   const response = await databases.Tasks.savePage({
+    where: databases.Tasks.Name.contains(''),
     properties: {
       Name: databases.Tasks.Name.fill('test1'),
       Text: databases.Tasks.Text.fill({ text: 'test3' }),
@@ -34,5 +35,30 @@ async function findBy() {
   }
 }
 
+async function findById() {
+  const response = await databases.Tasks.findPageById('16c34b35bfa4812fadc5c275593d7f8f').map(
+    (result) => {
+      return result.properties.MultiSelect
+    },
+  )
+  if (response.isOk()) {
+    console.dir(response.value, { depth: null })
+  }
+}
+
+async function chain() {
+  const response = await databases.Tasks.chain({
+    where: databases.Tasks.Name.contains('test1'),
+    from: databases.Tasks.Epic,
+    middle: databases.Epic.Category,
+    to: databases.Tasks.Category,
+  })
+  if (response.isOk()) {
+    console.log('chain success')
+  }
+}
+
 // void create()
-void findBy()
+// void findBy()
+// void findById()
+void chain()
