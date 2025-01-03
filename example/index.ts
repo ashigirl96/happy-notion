@@ -2,7 +2,6 @@ import { databases } from './generated'
 
 async function create() {
   const response = await databases.Tasks.savePage({
-    where: databases.Tasks.Name.contains(''),
     properties: {
       Name: databases.Tasks.Name.fill('test1'),
       Text: databases.Tasks.Text.fill({ text: 'test3' }),
@@ -58,7 +57,7 @@ async function chain() {
   }
 }
 
-// void create()
+void create()
 // void findBy()
 // void findById()
 void chain()
