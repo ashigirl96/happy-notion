@@ -21,7 +21,7 @@ export class DateField extends BaseField<'date'> {
   }
 
   map(filled: FillValue<'date'>): Date | null {
-    if (filled.date?.start === null) {
+    if (filled.date?.start == null) {
       return null
     }
     return new Date(filled.date.start)
