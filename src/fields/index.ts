@@ -105,7 +105,7 @@ type ExcludedKeys<T extends AbstractDatabase<any>> = keyof AbstractDatabase<T>
 export type BlockObjectRequest = Exclude<CreatePageParameters['children'], undefined>[0]
 export type SaveCriteria<T extends AbstractDatabase<any>> = {
   options?: {
-    isAppendChildren: (client: Client, pageId?: string) => Promise<boolean>
+    isAppendChildren: (client: Client, pageId: string) => Promise<boolean>
   }
   where: FindCriteria<T>['where']
   emoji?: Extract<CreatePageParameters['icon'], { type?: 'emoji' }>['emoji']
