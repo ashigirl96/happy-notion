@@ -52,6 +52,30 @@ export abstract class AbstractDatabase<T extends AbstractDatabase<any>> {
     )
   }
 
+  // A<=>B、B<=>Cがあったとして、A<=>Cをつなげるためのメソッド
+  //   const inputResponse = await databases.input.findPagesBy({
+  //     where: {
+  //       and: [databases.input.category.isEmpty(), databases.input.outputs.isNotEmpty()],
+  //     },
+  //     x: databases.input.outputs,
+  //     middle: 'category',
+  //     y: databases.input.category,
+  //   })
+  chain(criteria: FindCriteria<T>): ResultAsync<void, Error> {
+    // return this.findPagesBy(criteria).andThen((pages) => {
+    //   if (pages.length === 0) {
+    //     return err(new Error('No pages found'))
+    //   }
+    //   if (pages.length > 1) {
+    //     return err(new Error('Multiple pages found'))
+    //   }
+    // }
+    return this.findPagesBy(criteria).andThen((pages) => {
+      for (const page of pages) {
+      }
+    })
+  }
+
   /**
    * ページを作成 or 更新して、そのURLを返す
    */

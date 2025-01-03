@@ -11,6 +11,7 @@ export function addClass(
   },
 ) {
   const { className, envVar, fields } = options
+  const fields_ = fields.filter((v) => AbstractDatabase.mapPropertyName(v.name).length > 0)
   sourceFile.addClass({
     name: className,
     isExported: true,
@@ -21,7 +22,7 @@ export function addClass(
         initializer: envVar,
         isPublic: true,
       },
-      ...fields.map((field) => {
+      ...fields_.map((field) => {
         const name = AbstractDatabase.mapPropertyName(field.name)
         return {
           name,

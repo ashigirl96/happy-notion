@@ -12,6 +12,13 @@ describe('kebabToCamel', () => {
 
   it('空文字列を処理する', () => {
     expect(kebabToCamel('')).toBe('')
+    expect(kebabToCamel('hoge saga')).toBe('hogeSaga')
+    expect(kebabToCamel('hoge  saga !@#$ world')).toBe('hogeSagaWorld')
+  })
+
+  it('漢字', () => {
+    expect(kebabToCamel('漢字')).toBe('')
+    expect(kebabToCamel('想定Invest')).toBe('')
   })
 
   it('複数の連続するハイフンを処理する', () => {
