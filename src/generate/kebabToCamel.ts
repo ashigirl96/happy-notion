@@ -1,4 +1,4 @@
-export function kebabToCamel(str: string): string {
+export function isKebab(str: string): string {
   // 全角など、ASCII 範囲外の文字が含まれているかチェック
   if (/[^\x00-\x7F]/.test(str)) {
     return ''
@@ -29,4 +29,8 @@ export function kebabToCamel(str: string): string {
   }
 
   return result
+}
+
+export function kebabToCamel(str: string): string {
+  return str.replace(/-+([a-zA-Z0-9])/g, (_, group1) => group1.toUpperCase())
 }
