@@ -82,7 +82,7 @@ describe('AbstractDatabase', () => {
 
     const result = await db
       .savePage({
-        where: { where: mockCondition }, // ここに where があるので一応検索は行われるが mock で0件
+        where: db.Name.contains('test'),
         properties: {},
       })
       .match(
@@ -103,7 +103,7 @@ describe('AbstractDatabase', () => {
 
     const result = await db
       .savePage({
-        where: { where: mockCondition },
+        where: db.Name.contains('test'),
         properties: {},
         options: {
           isAppendChildren: async () => false,
@@ -134,7 +134,7 @@ describe('AbstractDatabase', () => {
     // ここではエラーが返ってくることを検証
     await db
       .savePage({
-        where: { where: mockCondition },
+        where: db.Name.contains('test'),
         properties: {},
       })
       .match(

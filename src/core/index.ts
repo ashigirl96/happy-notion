@@ -140,7 +140,7 @@ export abstract class AbstractDatabase<T extends AbstractDatabase<any>> {
         })
         // オプションで children を追加するかどうか
         if (options?.isAppendChildren) {
-          const isAppendChildren = await options.isAppendChildren(this.client)
+          const isAppendChildren = await options.isAppendChildren(this.client, pageId)
           if (isAppendChildren && criteria.children) {
             await this.client.blocks.children.append({
               block_id: pageId,
