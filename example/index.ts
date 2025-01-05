@@ -5,8 +5,8 @@ async function create() {
     properties: {
       Name: databases.Tasks.Name.fill('test1'),
       Text: databases.Tasks.Text.fill({ text: 'test3' }),
-      MultiSelect: databases.Tasks.MultiSelect.fill(['test10']),
-      Select: databases.Tasks.Select.fill('test10'),
+      MultiSelect: databases.Tasks.MultiSelect.fill(['test1', 'test2']),
+      Select: databases.Tasks.Select.fill('test3'),
       Checkbox: databases.Tasks.Checkbox.fill(true),
       Number: databases.Tasks.Number.fill(10),
       URL: databases.Tasks.URL.fill('https://example.com'),
