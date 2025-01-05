@@ -20,16 +20,56 @@ function createMockClient({
   appendFn,
   updateFn,
   retrieveFn,
+  updateDatabaseFn,
+  retrieveDatabaseFn,
 }: {
   queryFn?: (args: any) => any
   createFn?: (args: any) => any
   updateFn?: (args: any) => any
   appendFn?: (args: any) => any
   retrieveFn?: (args: any) => any
+  updateDatabaseFn?: (args: any) => any
+  retrieveDatabaseFn?: (args: any) => any
 }) {
   return {
     databases: {
       query: queryFn || (() => Promise.resolve({ results: [] })),
+      update: updateDatabaseFn || (() => Promise.resolve({ id: 'updated-database-id' })),
+      retrieve:
+        retrieveDatabaseFn ||
+        (() =>
+          Promise.resolve({
+            properties: {
+              MultiSelect: {
+                name: 'MultiSelect',
+                type: 'multi_select',
+                multi_select: {
+                  options: [
+                    {
+                      name: 'test1',
+                    },
+                    {
+                      name: 'test2',
+                    },
+                  ],
+                },
+              },
+              Select: {
+                name: 'Select',
+                type: 'select',
+                select: {
+                  options: [
+                    {
+                      name: 'test1',
+                    },
+                    {
+                      name: 'test2',
+                    },
+                  ],
+                },
+              },
+            },
+          })),
     },
     pages: {
       create: createFn || (() => Promise.resolve({ id: 'new-page-id' })),
@@ -219,7 +259,10 @@ describe('AbstractDatabase', () => {
     const result = await db
       .savePage({
         where: db.Name.contains('test'),
-        properties: {},
+        properties: {
+          Select: db.Select.fill('added'),
+          MultiSelect: db.MultiSelect.fill(['added1', 'added2']),
+        },
       })
       .match(
         (okValue) => okValue,

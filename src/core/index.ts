@@ -125,16 +125,18 @@ export abstract class AbstractDatabase<T extends AbstractDatabase<any>> {
    * ページを新規作成 or 更新し、その URL を返す
    */
   savePage(criteria: SaveCriteria<T>): ResultAsync<{ url: string }, Error> {
-    return this.existsPage(criteria).andThen((existsResult) => {
-      switch (existsResult.kind) {
-        case 'create':
-          return this.createPage(criteria)
-        case 'update':
-          return this.updatePage(criteria, existsResult.page.id)
-        default:
-          return ResultAsync.fromSafePromise(Promise.reject(new Error('Unexpected error')))
-      }
-    })
+    return this.updateSelect(criteria)
+      .andThen(() => this.existsPage(criteria))
+      .andThen((existsResult) => {
+        switch (existsResult.kind) {
+          case 'create':
+            return this.createPage(criteria)
+          case 'update':
+            return this.updatePage(criteria, existsResult.page.id)
+          default:
+            return ResultAsync.fromSafePromise(Promise.reject(new Error('Unexpected error')))
+        }
+      })
   }
 
   /**
@@ -226,6 +228,32 @@ export abstract class AbstractDatabase<T extends AbstractDatabase<any>> {
       })(),
       (e) => (e instanceof Error ? e : new Error(String(e))),
     )
+  }
+
+  private updateSelect(criteria: SaveCriteria<T>): ResultAsync<boolean, Error> {
+    const _ = async () => {
+      const response = await this.client.databases.retrieve({ database_id: this.id })
+      const properties = response.properties
+      for (const [key, value] of Object.entries(criteria.properties)) {
+        const propertyKind = Object.keys(value)[0]
+        if (propertyKind === 'select' && properties[key].type === 'select') {
+          // @ts-expect-error
+          properties[key].select.options = [...properties[key].select.options, value.select]
+        } else if (propertyKind === 'multi_select' && properties[key].type === 'multi_select') {
+          properties[key].multi_select.options = [
+            ...properties[key].multi_select.options,
+            // @ts-expect-error
+            ...value.multi_select,
+          ]
+        }
+      }
+      await this.client.databases.update({
+        database_id: this.id,
+        properties,
+      })
+      return true
+    }
+    return ResultAsync.fromPromise(_(), (e) => (e instanceof Error ? e : new Error(String(e))))
   }
 
   static mapPropertyName(name: string): string {
